@@ -1,0 +1,45 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run ingestor",
+      "type": "shell",
+      "command": "poetry run python -m ingestor.main",
+      "options": {
+        "cwd": "${workspaceFolder}/services/ingestor"
+      }
+    },
+    {
+      "label": "Lint (ruff)",
+      "type": "shell",
+      "command": "poetry run ruff check .",
+      "options": {
+        "cwd": "${workspaceFolder}/services/ingestor"
+      }
+    },
+    {
+      "label": "Format (black)",
+      "type": "shell",
+      "command": "poetry run black .",
+      "options": {
+        "cwd": "${workspaceFolder}/services/ingestor"
+      }
+    },
+    {
+      "label": "Type check (mypy)",
+      "type": "shell",
+      "command": "poetry run mypy src",
+      "options": {
+        "cwd": "${workspaceFolder}/services/ingestor"
+      }
+    },
+    {
+      "label": "Run tests",
+      "type": "shell",
+      "command": "poetry run pytest",
+      "options": {
+        "cwd": "${workspaceFolder}/services/ingestor"
+      }
+    }
+  ]
+}

@@ -10,7 +10,6 @@ poetry.lock
 .venv/
 
 # VS Code
-.vscode/
 .history/
 
 # Devcontainer
@@ -27,3 +26,6 @@ pytest_cache/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Environment variables
+.env

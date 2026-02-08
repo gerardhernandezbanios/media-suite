@@ -1,4 +1,3 @@
-version: "3.9"
 
 services:
   ingestor:
@@ -7,9 +6,9 @@ services:
     env_file:
       - .env
     volumes:
-      - ${MEDIA_DISK}/incoming:/data/incoming
-      - ${MEDIA_DISK}/photos:/data/photos
-      - ${MEDIA_DISK}/videos:/data/videos
-      - ${MEDIA_DISK}/animations:/data/animations
-      - ${MEDIA_DISK}/logs:/data/logs
+    - ${MEDIA_DISK}/incoming:/data/incoming
+    - ${MEDIA_DISK}/images:/data/images
+    - ${MEDIA_DISK}/video:/data/video
+    - ${MEDIA_DISK}/animation:/data/animation
+    - ${MEDIA_DISK}/logs:/data/logs
     restart: unless-stopped

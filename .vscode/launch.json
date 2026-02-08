@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug ingestor",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/services/ingestor/src/ingestor/main.py",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/infra/.env"
+    }
+  ]
+}

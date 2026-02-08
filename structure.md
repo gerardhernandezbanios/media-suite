@@ -35,6 +35,9 @@ media-suite/
 ├─ .devcontainer/
 │  ├─ devcontainer.json
 │  └─ Dockerfile
+├─ .vscode/
+│  ├─ tasks.json
+│  └─ launch.json
 ├─ infra/
 │  ├─ docker-compose.yml
 │  ├─ .env
@@ -42,14 +45,12 @@ media-suite/
 ├─ services/
 │  ├─ ingestor/
 │  │  ├─ pyproject.toml
-│  │  ├─ poetry.lock        # (se generará al instalar)
+│  │  ├─ poetry.lock
 │  │  ├─ Dockerfile
 │  │  ├─ src/
 │  │  │  └─ ingestor/...
 │  │  └─ tests/
 ├─ docs/
-│  ├─ arquitectura.md
-│  ├─ roadmap.md
-│  └─ adr/
 ├─ .gitignore
 └─ README.md
+
