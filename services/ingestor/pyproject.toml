@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "ingestor"
+version = "0.1.0"
+description = "Media Suite - Ingestor Service"
+authors = ["Gerard <you@example.com>"]
+packages = [{ include = "ingestor", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+Pillow = "^10.2.0"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.3.0"
+black = "^24.1.1"
+mypy = "^1.8.0"
+pytest = "^8.0.0"
+
+[tool.poetry.scripts]
+ingestor = "ingestor.main:run"
+
+[tool.black]
+line-length = 88
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = false

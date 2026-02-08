@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  ingestor:
+    build: ../services/ingestor
+    container_name: media_ingestor
+    env_file:
+      - .env
+    volumes:
+      - ${MEDIA_DISK}/incoming:/data/incoming
+      - ${MEDIA_DISK}/photos:/data/photos
+      - ${MEDIA_DISK}/videos:/data/videos
+      - ${MEDIA_DISK}/animations:/data/animations
+      - ${MEDIA_DISK}/logs:/data/logs
+    restart: unless-stopped

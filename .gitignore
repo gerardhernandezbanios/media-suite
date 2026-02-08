@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Poetry
+poetry.lock
+*/.venv/
+.venv/
+
+# VS Code
+.vscode/
+.history/
+
+# Devcontainer
+.devcontainer/.cache/
+
+# Docker
+*.log
+docker-compose.override.yml
+
+# Tests
+.coverage
+pytest_cache/
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -28,3 +28,28 @@ media-suite/
 │  └─ adr/
 ├─ .gitignore
 └─ README.md
+
+## Estructura final actualizada
+
+media-suite/
+├─ .devcontainer/
+│  ├─ devcontainer.json
+│  └─ Dockerfile
+├─ infra/
+│  ├─ docker-compose.yml
+│  ├─ .env
+│  └─ README.md
+├─ services/
+│  ├─ ingestor/
+│  │  ├─ pyproject.toml
+│  │  ├─ poetry.lock        # (se generará al instalar)
+│  │  ├─ Dockerfile
+│  │  ├─ src/
+│  │  │  └─ ingestor/...
+│  │  └─ tests/
+├─ docs/
+│  ├─ arquitectura.md
+│  ├─ roadmap.md
+│  └─ adr/
+├─ .gitignore
+└─ README.md
