@@ -35,3 +35,9 @@ Thumbs.db
 
 # ruff cache
 .ruff_cache/
+
+# pytest cache
+.pytest_cache/
+
+# egg-info
+*.egg-info/

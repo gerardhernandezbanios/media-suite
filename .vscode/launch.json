@@ -5,9 +5,22 @@
       "name": "Debug ingestor",
       "type": "debugpy",
       "request": "launch",
-      "program": "${workspaceFolder}/services/ingestor/src/ingestor/main.py",
+      "module": "ingestor.main",
       "console": "integratedTerminal",
-      "envFile": "${workspaceFolder}/infra/.env"
+      "envFile": "${workspaceFolder}/infra/.env",
+      "cwd": "${workspaceFolder}/services/ingestor",
+      "justMyCode": true
+    },
+    {
+      "name": "Debug tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-s", "tests"],
+      "cwd": "${workspaceFolder}/services/ingestor",
+      "console": "integratedTerminal",
+      "justMyCode": true
     }
+
   ]
 }

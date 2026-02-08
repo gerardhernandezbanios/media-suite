@@ -9,6 +9,7 @@
     }
   },
   "postCreateCommand": "pip install poetry && poetry config virtualenvs.in-project true",
+  "postStartCommand": "/bin/bash /workspaces/media-suite/.devcontainer/load-env.sh",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -21,6 +22,9 @@
         "editorconfig.editorconfig"
       ]
     }
+  },
+  "containerEnv": {
+    "ENV_FILE": "/workspaces/media-suite/infra/.env"
   },
   "remoteUser": "vscode"
 }
