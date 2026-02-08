@@ -5,11 +5,11 @@ from pathlib import Path
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-from .config import Config
-from .file_classifier import classify
-from .mover import move_file
-from .stats import Stats
-from .zip_processor import process_zip
+from ingestor.config import Config
+from ingestor.file_classifier import classify
+from ingestor.mover import move_file
+from ingestor.stats import Stats
+from ingestor.zip_processor import process_zip
 
 
 class IngestEventHandler(FileSystemEventHandler):
