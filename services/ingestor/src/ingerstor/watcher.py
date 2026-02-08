@@ -1,14 +1,15 @@
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
-from pathlib import Path
+import csv
 import time
+from pathlib import Path
+
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
 
 from .config import Config
 from .file_classifier import classify
 from .mover import move_file
-from .zip_processor import process_zip
 from .stats import Stats
-import csv
+from .zip_processor import process_zip
 
 
 class IngestEventHandler(FileSystemEventHandler):

@@ -1,5 +1,7 @@
 from pathlib import Path
+
 from .config import Config
+
 
 def classify(file: Path):
     ext = file.suffix.lower()

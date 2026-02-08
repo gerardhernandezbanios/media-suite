@@ -1,9 +1,13 @@
-from collections import defaultdict
 import csv
+from collections import defaultdict
+from typing import DefaultDict, Dict
+
 
 class Stats:
-    global_stats = defaultdict(int)
-    by_month = defaultdict(lambda: {"images": 0, "videos": 0, "animations": 0})
+    global_stats: DefaultDict[str, int] = defaultdict(int)
+    by_month: DefaultDict[str, Dict[str, int]] = defaultdict(
+        lambda: {"images": 0, "videos": 0, "animations": 0}
+    )
 
     @staticmethod
     def update_global(file, special=None):

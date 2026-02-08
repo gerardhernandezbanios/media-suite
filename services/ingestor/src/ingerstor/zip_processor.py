@@ -1,10 +1,12 @@
-import zipfile
 import shutil
+import zipfile
 from pathlib import Path
+
 from .config import Config
-from .mover import move_file
 from .file_classifier import classify
+from .mover import move_file
 from .stats import Stats
+
 
 def process_zip(file: Path, log_writer):
     tmp_dir = Config.SOURCE_DIR / f"tmp_zip_{file.stem}"

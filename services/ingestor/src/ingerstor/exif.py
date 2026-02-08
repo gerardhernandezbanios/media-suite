@@ -1,6 +1,8 @@
+from datetime import datetime
+
 from PIL import Image
 from PIL.ExifTags import TAGS
-from datetime import datetime
+
 
 def get_exif_date(file):
     try:

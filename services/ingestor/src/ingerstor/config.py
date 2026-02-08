@@ -1,5 +1,6 @@
-from pathlib import Path
 import os
+from pathlib import Path
+
 
 class Config:
     SOURCE_DIR = Path(os.getenv("SOURCE_DIR", "/data/incoming"))

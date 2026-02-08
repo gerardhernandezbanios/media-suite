@@ -1,0 +1,6 @@
+{
+  "problemMatchers": [
+    "./ruff-problem-matcher.json",
+    "./mypy-problem-matcher.json"
+  ]
+}

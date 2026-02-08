@@ -1,9 +1,10 @@
 import shutil
 from datetime import datetime
 from pathlib import Path
+
 from .exif import get_exif_date
-from .config import Config
 from .stats import Stats
+
 
 def move_file(file: Path, root_dest: Path, log_writer, special_folder=None, zip_origin=None):
     if special_folder:
