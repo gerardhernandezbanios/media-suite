@@ -38,6 +38,7 @@ class IngestService:
     def _move_and_log(self, file: Path, root_dest: Path, special_folder=None, zip_origin=None):
         dest_dir = compute_destination(file, root_dest, special_folder)
         dest_dir.mkdir(parents=True, exist_ok=True)
+        date = self.fs.get_date(file)
 
         new_path = compute_unique_name(dest_dir, file)
 
@@ -46,7 +47,6 @@ class IngestService:
 
         Stats.update_global(file, special_folder)
         if not special_folder:
-            date = self.fs.get_date(file)
             Stats.update_by_month(file, str(date.year), f"{date.month:02d}")
 
     def _process_zip(self, file: Path):

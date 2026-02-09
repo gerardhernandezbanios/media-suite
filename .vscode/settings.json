@@ -1,4 +1,10 @@
 {
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.nosetestsEnabled": false,
+  "python.testing.pytestArgs": [
+    "services"
+  ],
   "problemMatchers": [
     "./ruff-problem-matcher.json",
     "./mypy-problem-matcher.json"

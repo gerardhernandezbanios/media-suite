@@ -1,7 +1,7 @@
 # test/application/test_service.py
 from ingestor.application.service import IngestService
 from ingestor.config import Config
-from ingestor.logging_base import IngestLogger
+from ingestor.infrastructure.logging_base import IngestLogger
 
 
 class FakeLogger(IngestLogger):

@@ -16,7 +16,7 @@
       "options": {
         "cwd": "${workspaceFolder}/services/ingestor"
       },
-      "problemMatcher": "$ruff"
+      "problemMatcher": "$python"
     },
     {
       "label": "Lint (ruff fix)",
@@ -25,7 +25,7 @@
       "options": {
         "cwd": "${workspaceFolder}/services/ingestor"
       },
-      "problemMatcher": "$ruff"
+      "problemMatcher": "$python"
     },
     {
       "label": "Format (black)",
@@ -39,7 +39,7 @@
       "label": "Type check (mypy)",
       "type": "shell",
       "command": "poetry run mypy src",
-      "problemMatcher": "$mypy",
+      "problemMatcher": "$python",
       "options": {
         "cwd": "${workspaceFolder}/services/ingestor"
       }
@@ -48,6 +48,7 @@
       "label": "Run tests",
       "type": "shell",
       "command": "poetry run pytest",
+      "problemMatcher": "$python",
       "options": {
         "cwd": "${workspaceFolder}/services/ingestor"
       }

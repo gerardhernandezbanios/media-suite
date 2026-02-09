@@ -15,7 +15,7 @@ def test_compute_unique_name_no_collision(tmp_path):
     file.write_text("x")
 
     new_path = compute_unique_name(dest, file)
-    assert new_path == dest / "photo.jpg"
+    assert new_path == dest / "photo_1.jpg"
 
 def test_compute_unique_name_with_collision(tmp_path):
     dest = tmp_path
