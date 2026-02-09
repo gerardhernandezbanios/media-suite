@@ -54,3 +54,21 @@ media-suite/
 ├─ .gitignore
 └─ README.md
 
+## Estructura aplicando arquitectura limpia
+
+src/ingestor/
+  domain/
+    classifier.py
+    exif_reader.py
+    mover.py
+    stats.py
+  application/
+    service.py
+  infrastructure/
+    logging_csv.py
+    logging_base.py
+    file_system.py
+    zip_extractor.py
+    watcher.py
+  config.py
+main.py
