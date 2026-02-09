@@ -1,12 +1,13 @@
 # application/service.py
 from pathlib import Path
+
+from ingestor.config import Config
 from ingestor.domain.classifier import classify
 from ingestor.domain.mover import compute_destination, compute_unique_name
 from ingestor.domain.stats import Stats
-from ingestor.infraestructure.file_system import FileSystem
-from ingestor.infraestructure.zip_extractor import ZipExtractor
-from ingestor.infraestructure.logging_base import IngestLogger
-from ingestor.config import Config
+from ingestor.infrastructure.file_system import FileSystem
+from ingestor.infrastructure.logging_base import IngestLogger
+from ingestor.infrastructure.zip_extractor import ZipExtractor
 
 
 class IngestService:

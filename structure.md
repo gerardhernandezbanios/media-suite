@@ -56,19 +56,31 @@ media-suite/
 
 ## Estructura aplicando arquitectura limpia
 
-src/ingestor/
+src/
+  ingestor/
+    config.py          ← infraestructura compartida
+    domain/
+      classifier.py
+      exif_reader.py
+      mover.py
+      stats.py
+    application/
+      service.py
+    infrastructure/
+      logging_base.py
+      logging_csv.py
+      file_system.py
+      zip_extractor.py
+      watcher.py
+  main.py               ← nivel superior (entrypoint)
+tests/
+  conftest.py
   domain/
-    classifier.py
-    exif_reader.py
-    mover.py
-    stats.py
-  application/
-    service.py
+    test_classifier.py
+    test_mover.py
   infrastructure/
-    logging_csv.py
-    logging_base.py
-    file_system.py
-    zip_extractor.py
-    watcher.py
-  config.py
-main.py
+    test_logging_csv.py
+    test_zip_extractor.py
+  application/
+    test_service.py
+

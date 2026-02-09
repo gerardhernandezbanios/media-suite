@@ -1,6 +1,8 @@
 # domain\classifier.py
 from pathlib import Path
+
 from ingestor.config import Config
+
 
 def classify(file: Path) -> str:
     ext = file.suffix.lower()

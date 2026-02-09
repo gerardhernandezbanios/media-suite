@@ -1,6 +1,8 @@
-from ingestor.watcher import start_watcher
-from ingestor.config import Config
 import json
+
+from ingestor.config import Config
+from ingestor.watcher import start_watcher
+
 
 def dump_config():
     config_path = Config.LOG_FILE.parent / "service_config.json"

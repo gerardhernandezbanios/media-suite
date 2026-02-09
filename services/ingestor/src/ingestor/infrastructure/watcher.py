@@ -1,11 +1,13 @@
-# infraestructure/watcher.py
+# infrastructure/watcher.py
+import time
 from pathlib import Path
+
+from ingestor.application.service import IngestService
+from ingestor.config import Config
+from ingestor.infrastructure.logging_csv import CsvIngestLogger
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
-from ingestor.application.service import IngestService
-from ingestor.infraestructure.logging_csv import CsvIngestLogger
-from ingestor.config import Config
-import time
+
 
 class IngestEventHandler(FileSystemEventHandler):
     def __init__(self):

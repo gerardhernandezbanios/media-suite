@@ -1,7 +1,9 @@
 # domain\exif_reader.py
 from datetime import datetime
 from pathlib import Path
-from PIL import Image, ExifTags
+
+from PIL import ExifTags, Image
+
 
 def get_exif_date(file: Path) -> datetime:
     try:

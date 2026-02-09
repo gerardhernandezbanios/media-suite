@@ -39,5 +39,9 @@ Thumbs.db
 # pytest cache
 .pytest_cache/
 
-# egg-info
+# Python packaging artifacts
 *.egg-info/
+*.egg
+dist/
+build/
+src/ingestor.egg-info/

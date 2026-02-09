@@ -1,8 +1,9 @@
-# src/ingestor/logging_csv.py
+# src/ingestor/infrastructure/logging_csv.py
 import csv
-from pathlib import Path
 from datetime import datetime
-from ingestor.infraestructure.logging_base import IngestLogger
+from pathlib import Path
+
+from ingestor.infrastructure.logging_base import IngestLogger
 
 
 class CsvIngestLogger(IngestLogger):
