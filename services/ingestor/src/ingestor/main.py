@@ -9,7 +9,6 @@ logger = setup_logging()
 
 
 def dump_config():
-    config_path = Config.LOG_FILE.parent / "service_config.json"
     config = {
         "SOURCE_DIR": str(Config.SOURCE_DIR),
         "IMAGES_ROOT": str(Config.IMAGES_ROOT),
@@ -18,18 +17,20 @@ def dump_config():
         "LOG_FILE": str(Config.LOG_FILE),
         "AUDIT_FILE": str(Config.AUDIT_FILE),
     }
-    config_path.write_text(json.dumps(config, indent=4))
+    print("Current configuration:")
+    print(json.dumps(config, indent=4))
 
 
 def run():
-    logger.info("Starting ingestor service...")
-
-    logger.debug("Validating configuration...")
-    Config.validate()
-    logger.debug("✔ Configuration OK")
+    print("🚀 Starting ingestor service...")
 
     dump_config()
-    logger.debug("✔ Configuration dumped")
 
-    logger.info("Starting watcher...")
+    print("🔍 Validating configuration...")
+    Config.validate()
+
+    print("👀 Starting watcher...")
     start_watcher()
+
+if __name__ == "__main__":
+    run()

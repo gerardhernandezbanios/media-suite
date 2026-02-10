@@ -7,5 +7,5 @@ services:
     env_file:
       - .env
     volumes:
-      - ${MEDIA_DISK}:/data
+      - ${MEDIA_DISK}:/data:rw
     restart: unless-stopped

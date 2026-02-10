@@ -40,10 +40,23 @@ class Config:
             cls.AUDIT_FILE.parent,
         ]
 
-        missing = [str(p) for p in required_dirs if not p.exists()]
+        missing = [p for p in required_dirs if not p.exists()]
 
-        if missing:
-            raise RuntimeError(
-                "❌ Configuración inválida. Faltan directorios:\n"
-                + "\n".join(f" - {m}" for m in missing)
-            )
+        # Crear directorios faltantes
+        for p in missing:
+            try:
+                p.mkdir(parents=True, exist_ok=True)
+                print(f"✔ Created missing directory: {p}")
+            except Exception as e:
+                raise RuntimeError(f"❌ Cannot create directory {p}: {e}")
+
+        # Comprobar permisos de escritura
+        for p in required_dirs:
+            try:
+                test_file = p / ".write_test"
+                test_file.write_text("ok")
+                test_file.unlink()
+            except Exception as e:
+                raise RuntimeError(f"❌ No write permission in {p}: {e}")
+
+        print("✔ Configuration validated and directories ready")
