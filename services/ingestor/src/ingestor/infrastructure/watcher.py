@@ -4,9 +4,12 @@ from pathlib import Path
 
 from ingestor.application.service import IngestService
 from ingestor.config import Config
+from ingestor.infrastructure.logging.logger import get_logger
 from ingestor.infrastructure.logging_csv import CsvIngestLogger
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
+
+logger = get_logger(__name__)
 
 
 class IngestEventHandler(FileSystemEventHandler):
@@ -26,7 +29,7 @@ def start_watcher():
     observer.schedule(handler, str(Config.SOURCE_DIR), recursive=False)
     observer.start()
 
-    print(f"Watching for new files in: {Config.SOURCE_DIR}")
+    logger.info(f"Watcher started for directory: {Config.SOURCE_DIR}")
 
     try:
         while True:
