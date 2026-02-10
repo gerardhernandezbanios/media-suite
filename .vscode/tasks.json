@@ -2,11 +2,11 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Run ingestor",
+      "label": "Run ingestor (manual)",
       "type": "shell",
-      "command": "poetry run python -m ingestor.main",
+      "command": "poetry run python -m main",
       "options": {
-        "cwd": "${workspaceFolder}/services/ingestor"
+        "cwd": "${workspaceFolder}/services/ingestor/src"
       }
     },
     {

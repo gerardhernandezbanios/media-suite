@@ -1,7 +1,9 @@
+
+name: media-suite
+
 services:
   ingestor:
     build: ../services/ingestor
-    container_name: media_suite
     env_file:
       - .env
     volumes:

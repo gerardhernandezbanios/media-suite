@@ -8,19 +8,11 @@
       "module": "ingestor.main",
       "console": "integratedTerminal",
       "envFile": "${workspaceFolder}/infra/.env",
-      "cwd": "${workspaceFolder}/services/ingestor",
-      "justMyCode": true
-    },
-    {
-      "name": "Debug tests",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": ["-s", "tests"],
-      "cwd": "${workspaceFolder}/services/ingestor",
-      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/services/ingestor/src",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/services/ingestor/src"
+      },
       "justMyCode": true
     }
-
   ]
 }
