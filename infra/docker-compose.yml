@@ -1,14 +1,9 @@
-
 services:
   ingestor:
     build: ../services/ingestor
-    container_name: media_ingestor
+    container_name: media_suite
     env_file:
       - .env
     volumes:
-    - ${MEDIA_DISK}/incoming:/data/incoming
-    - ${MEDIA_DISK}/images:/data/images
-    - ${MEDIA_DISK}/video:/data/video
-    - ${MEDIA_DISK}/animation:/data/animation
-    - ${MEDIA_DISK}/logs:/data/logs
+      - ${MEDIA_DISK}:/data
     restart: unless-stopped

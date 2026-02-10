@@ -23,5 +23,8 @@
     }
   },
   "remoteUser": "vscode",
-  "runArgs": ["--env-file","infra/.env"]
+  "runArgs": ["--env-file","infra/.env"],
+  "mounts": [
+    "source=/host_mnt/d/Gerard,target=/data,type=bind"
+  ]
 }

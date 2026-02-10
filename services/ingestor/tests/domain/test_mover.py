@@ -9,6 +9,7 @@ def test_compute_destination_special_folder(tmp_path):
     dest = compute_destination(file, tmp_path, "collage")
     assert dest == tmp_path / "collage"
 
+
 def test_compute_unique_name_no_collision(tmp_path):
     dest = tmp_path
     file = tmp_path / "photo.jpg"
@@ -16,6 +17,7 @@ def test_compute_unique_name_no_collision(tmp_path):
 
     new_path = compute_unique_name(dest, file)
     assert new_path == dest / "photo_1.jpg"
+
 
 def test_compute_unique_name_with_collision(tmp_path):
     dest = tmp_path

@@ -4,7 +4,9 @@ from pathlib import Path
 from ingestor.domain.exif_reader import get_exif_date
 
 
-def compute_destination(file: Path, root_dest: Path, special_folder: str | None) -> Path:
+def compute_destination(
+    file: Path, root_dest: Path, special_folder: str | None
+) -> Path:
     if special_folder:
         return root_dest / special_folder
 

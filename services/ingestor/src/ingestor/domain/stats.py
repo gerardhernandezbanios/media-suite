@@ -50,4 +50,6 @@ class Stats:
             writer.writerow([])
             writer.writerow(["Year-Month", "Images", "Videos", "Animations"])
             for ym, counts in Stats.by_month.items():
-                writer.writerow([ym, counts["images"], counts["videos"], counts["animations"]])
+                writer.writerow(
+                    [ym, counts["images"], counts["videos"], counts["animations"]]
+                )

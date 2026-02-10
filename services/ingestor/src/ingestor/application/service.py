@@ -30,12 +30,14 @@ class IngestService:
         root = {
             "image": Config.IMAGES_ROOT,
             "video": Config.VIDEOS_ROOT,
-            "animation": Config.ANIMATIONS_ROOT
+            "animation": Config.ANIMATIONS_ROOT,
         }[file_type]
 
         self._move_and_log(file, root)
 
-    def _move_and_log(self, file: Path, root_dest: Path, special_folder=None, zip_origin=None):
+    def _move_and_log(
+        self, file: Path, root_dest: Path, special_folder=None, zip_origin=None
+    ):
         dest_dir = compute_destination(file, root_dest, special_folder)
         dest_dir.mkdir(parents=True, exist_ok=True)
         date = self.fs.get_date(file)
