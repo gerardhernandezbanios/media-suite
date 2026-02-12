@@ -4,16 +4,15 @@ from pathlib import Path
 from ingestor.domain.exif_reader import get_exif_date
 
 
-def compute_destination(
-    file: Path, root_dest: Path, special_folder: str | None
-) -> Path:
-    if special_folder:
-        return root_dest / special_folder
-
+def compute_destination(file: Path, root_dest: Path, category: str) -> Path:
+    """
+    Devuelve la carpeta final: root/category/YYYY/MM
+    """
     date = get_exif_date(file)
     year = str(date.year)
     month = f"{date.month:02d}"
-    return root_dest / year / month
+
+    return root_dest / category / year / month
 
 
 def compute_unique_name(dest_dir: Path, file: Path) -> Path:

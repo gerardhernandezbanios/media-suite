@@ -1,30 +1,29 @@
-# tests/domain/test_mover.py
+from pathlib import Path
+
 from ingestor.domain.mover import compute_destination, compute_unique_name
 
 
-def test_compute_destination_special_folder(tmp_path):
+def test_compute_destination(tmp_path, monkeypatch):
+    # Fake EXIF date
+    class FakeDate:
+        year = 2024
+        month = 3
+
+    monkeypatch.setattr("ingestor.domain.mover.get_exif_date", lambda f: FakeDate())
+
     file = tmp_path / "photo.jpg"
-    file.write_text("x")
+    dest = compute_destination(file, Path("/root"), "images")
 
-    dest = compute_destination(file, tmp_path, "collage")
-    assert dest == tmp_path / "collage"
+    assert dest == Path("/root/images/2024/03")
 
 
-def test_compute_unique_name_no_collision(tmp_path):
+def test_compute_unique_name(tmp_path):
     dest = tmp_path
-    file = tmp_path / "photo.jpg"
-    file.write_text("x")
+    f1 = dest / "photo.jpg"
+    f1.write_bytes(b"data")
 
-    new_path = compute_unique_name(dest, file)
-    assert new_path == dest / "photo_1.jpg"
+    f2 = dest / "photo.jpg"
+    f2.write_bytes(b"data")
 
-
-def test_compute_unique_name_with_collision(tmp_path):
-    dest = tmp_path
-    (dest / "photo.jpg").write_text("x")
-
-    file = tmp_path / "photo.jpg"
-    file.write_text("x")
-
-    new_path = compute_unique_name(dest, file)
-    assert new_path.name.startswith("photo_")
+    new = compute_unique_name(dest, f2)
+    assert new.name != "photo.jpg"

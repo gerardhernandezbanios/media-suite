@@ -12,43 +12,85 @@ def get_env_path(var_name: str) -> Path:
 
 
 class Config:
-    SOURCE_DIR = get_env_path("SOURCE_DIR")
-    IMAGES_ROOT = get_env_path("IMAGES_ROOT")
-    VIDEOS_ROOT = get_env_path("VIDEOS_ROOT")
-    ANIMATIONS_ROOT = get_env_path("ANIMATIONS_ROOT")
-    LOG_FILE = get_env_path("LOG_FILE")
-    AUDIT_FILE = get_env_path("AUDIT_FILE")
+    # Directorios principales
+    SOURCE_DIR: Path = get_env_path("SOURCE_DIR")
+    IMAGES_ROOT: Path = get_env_path("IMAGES_ROOT")
+    VIDEOS_ROOT: Path = get_env_path("VIDEOS_ROOT")
+    ANIMATIONS_ROOT: Path = get_env_path("ANIMATIONS_ROOT")
+    UNSUPPORTED_ROOT: Path = get_env_path("UNSUPPORTED_ROOT")
 
-    IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png"]
-    VIDEO_EXTENSIONS = [".mp4", ".mov", ".avi", ".mkv"]
-    ANIMATION_EXTENSIONS = [".gif"]
+    # Logging
+    LOG_FILE: Path = get_env_path("LOG_FILE")
+    AUDIT_FILE: Path = get_env_path("AUDIT_FILE")
 
-    SPECIAL_FOLDERS = {
-        "collage": "collage",
-        "effect": "effects",
-        "screenshot": "screenshots",
-    }
+    # Extensiones soportadas
+    IMAGE_EXTENSIONS: list[str] = [
+        "jpg",
+        "jpeg",
+        "jpe",
+        "jfif",
+        "png",
+        "bmp",
+        "tif",
+        "tiff",
+        "heic",
+        "heif",
+        "raw",
+        "arw",
+        "cr2",
+        "nef",
+        "orf",
+        "sr2",
+        "ppm",
+        "pgm",
+        "pbm",
+        "pnm",
+        "svg",
+    ]
+
+    VIDEO_EXTENSIONS: list[str] = [
+        "mp4",
+        "m4v",
+        "mov",
+        "avi",
+        "mkv",
+        "webm",
+        "flv",
+        "wmv",
+        "mpeg",
+        "mpg",
+        "mpe",
+        "3gp",
+        "3g2",
+        "mts",
+        "m2ts",
+        "ts",
+    ]
+
+    ANIMATION_EXTENSIONS: list[str] = ["gif", "apng", "webp"]
+
+    ARCHIVE_EXTENSIONS: list[str] = ["zip", "rar", "7z", "tar", "gz"]
 
     @classmethod
-    def validate(cls):
+    def validate(cls) -> None:
         required_dirs = [
             cls.SOURCE_DIR,
             cls.IMAGES_ROOT,
             cls.VIDEOS_ROOT,
             cls.ANIMATIONS_ROOT,
+            cls.UNSUPPORTED_ROOT,
             cls.LOG_FILE.parent,
             cls.AUDIT_FILE.parent,
         ]
 
-        missing = [p for p in required_dirs if not p.exists()]
-
         # Crear directorios faltantes
-        for p in missing:
-            try:
-                p.mkdir(parents=True, exist_ok=True)
-                print(f"✔ Created missing directory: {p}")
-            except Exception as e:
-                raise RuntimeError(f"❌ Cannot create directory {p}: {e}")
+        for p in required_dirs:
+            if not p.exists():
+                try:
+                    p.mkdir(parents=True, exist_ok=True)
+                    print(f"✔ Created missing directory: {p}")
+                except Exception as e:
+                    raise RuntimeError(f"❌ Cannot create directory {p}: {e}")
 
         # Comprobar permisos de escritura
         for p in required_dirs:

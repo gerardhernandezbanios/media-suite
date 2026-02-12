@@ -25,3 +25,19 @@ class ZipExtractor:
         logger.info(f"Removing temporary directory: {tmp_dir} and ZIP file: {zip_file}")
         shutil.rmtree(tmp_dir)
         zip_file.unlink()
+
+
+# import zipfile
+# from pathlib import Path
+
+
+# class ZipExtractor:
+#     def extract(self, zip_path: Path, dest: Path) -> list[Path]:
+#         extracted = []
+
+#         with zipfile.ZipFile(zip_path, "r") as z:
+#             for name in z.namelist():
+#                 z.extract(name, dest)
+#                 extracted.append(dest / name)
+
+#         return extracted

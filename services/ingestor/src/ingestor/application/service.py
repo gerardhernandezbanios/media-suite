@@ -1,60 +1,68 @@
-# application/service.py
 from pathlib import Path
 
 from ingestor.config import Config
-from ingestor.domain.classifier import classify
+from ingestor.domain.classifier import Classifier
+from ingestor.domain.file_inspector import FileInspector
 from ingestor.domain.mover import compute_destination, compute_unique_name
-from ingestor.domain.stats import Stats
+from ingestor.domain.renamer import Renamer
 from ingestor.infrastructure.file_system import FileSystem
-from ingestor.infrastructure.logging_base import IngestLogger
 from ingestor.infrastructure.zip_extractor import ZipExtractor
 
 
 class IngestService:
-    def __init__(self, logger: IngestLogger):
+    def __init__(self, logger):
         self.logger = logger
+        self.inspector = FileInspector()
+        self.classifier = Classifier()
+        self.renamer = Renamer()
         self.fs = FileSystem()
         self.zip = ZipExtractor()
 
-    def process_file(self, file: Path):
-        file_type = classify(file)
+    def process_file(self, path: Path):
+        info = self.inspector.inspect(path)
 
-        if file_type == "zip":
-            return self._process_zip(file)
-
-        if file_type == "unsupported":
-            Stats.global_stats["unsupported"] += 1
-            self.logger.log_unsupported(file)
+        # 1. Directorios no se procesan
+        if info.is_directory:
             return
 
-        root = {
-            "image": Config.IMAGES_ROOT,
-            "video": Config.VIDEOS_ROOT,
-            "animation": Config.ANIMATIONS_ROOT,
-        }[file_type]
+        # 2. ZIP → extraer y reinyectar
+        if info.is_archive:
+            extracted = self.zip.extract(path, Config.SOURCE_DIR)
+            for f in extracted:
+                self.process_file(f)
+            return
 
-        self._move_and_log(file, root)
+        # 3. Normalizar nombre
+        normalized = self.renamer.normalize(path)
+        if normalized != path:
+            path.rename(normalized)
+            path = normalized
 
-    def _move_and_log(
-        self, file: Path, root_dest: Path, special_folder=None, zip_origin=None
-    ):
-        dest_dir = compute_destination(file, root_dest, special_folder)
-        dest_dir.mkdir(parents=True, exist_ok=True)
-        date = self.fs.get_date(file)
+        # 4. Clasificación
+        category = self.classifier.classify(info)
 
-        new_path = compute_unique_name(dest_dir, file)
+        # 5. Seleccionar raíz según categoría
+        root = self._select_root(category)
 
-        self.fs.move(file, new_path)
-        self.logger.log_move(file, new_path, self.fs.now(), zip_origin)
+        # 6. Calcular destino final (root/YYYY/MM)
+        dest_dir = compute_destination(path, root, category)
 
-        Stats.update_global(file, special_folder)
-        if not special_folder:
-            Stats.update_by_month(file, str(date.year), f"{date.month:02d}")
+        # 7. Evitar colisiones
+        final_path = compute_unique_name(dest_dir, path)
 
-    def _process_zip(self, file: Path):
-        extracted_files = self.zip.extract(file)
+        # 8. Mover archivo
+        self.fs.move(path, final_path)
 
-        for extracted in extracted_files:
-            self.process_file(extracted)
+        # 9. Registrar
+        self.logger.log_ingest(path, final_path, category)
 
-        self.zip.cleanup(file)
+    CATEGORY_ROOTS = {
+        "images": Config.IMAGES_ROOT,
+        "videos": Config.VIDEOS_ROOT,
+        "animations": Config.ANIMATIONS_ROOT,
+        "archives": Config.UNSUPPORTED_ROOT,
+        "unsupported": Config.UNSUPPORTED_ROOT,
+    }
+
+    def _select_root(self, category: str) -> Path:
+        return self.CATEGORY_ROOTS.get(category, Config.UNSUPPORTED_ROOT)
