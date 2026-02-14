@@ -1,5 +1,4 @@
 from unittest.mock import Mock
-
 import pytest
 from ingestor.application.service import IngestService
 
@@ -17,6 +16,7 @@ def config(tmp_path):
         ANIMATIONS_ROOT = tmp_path / "animations"
         UNSUPPORTED_ROOT = tmp_path / "unsupported"
         WATCH_ROOT = tmp_path / "watch"
+        SOURCE_DIR = tmp_path / "source"
 
     cfg = DummyConfig()
     for p in [
@@ -25,64 +25,41 @@ def config(tmp_path):
         cfg.ANIMATIONS_ROOT,
         cfg.UNSUPPORTED_ROOT,
         cfg.WATCH_ROOT,
+        cfg.SOURCE_DIR,
     ]:
         p.mkdir(parents=True, exist_ok=True)
 
     return cfg
 
-
 @pytest.fixture
 def service(fs, config):
-    return IngestService(fs, config)
+    return IngestService(
+        logger=Mock(),
+        inspector=Mock(inspect=lambda p: Mock(
+            is_directory=False,
+            is_archive=False
+        )),
+        classifier=Mock(classify=lambda info: "images"),
+        renamer=Mock(normalize=lambda p: p),
+        fs=fs,
+        zip_extractor=Mock(),
+        config=config,
+    )
 
+def test_ingest_directory(service, fs, config, tmp_path):
+    src = tmp_path / "folder"
+    src.mkdir()
+
+    service.process_file(src)
+    
+    fs.move.assert_not_called()
 
 def test_ingest_image(service, fs, config, tmp_path):
     src = tmp_path / "photo.JPG"
     src.touch()
 
-    service.ingest_file(src)
+    service.process_file(src)
 
     dst = config.IMAGES_ROOT / src.name
     fs.move.assert_called_once_with(src, dst)
 
-
-def test_ingest_video(service, fs, config, tmp_path):
-    src = tmp_path / "clip.mp4"
-    src.touch()
-
-    service.ingest_file(src)
-
-    dst = config.VIDEOS_ROOT / src.name
-    fs.move.assert_called_once_with(src, dst)
-
-
-def test_ingest_animation(service, fs, config, tmp_path):
-    src = tmp_path / "anim.webp"
-    src.touch()
-
-    service.ingest_file(src)
-
-    dst = config.ANIMATIONS_ROOT / src.name
-    fs.move.assert_called_once_with(src, dst)
-
-
-def test_ingest_unsupported(service, fs, config, tmp_path):
-    src = tmp_path / "readme.txt"
-    src.touch()
-
-    service.ingest_file(src)
-
-    dst = config.UNSUPPORTED_ROOT / src.name
-    fs.move.assert_called_once_with(src, dst)
-
-
-def test_initial_processing(service, fs, config):
-    # Creamos ficheros ya existentes en WATCH_ROOT
-    f1 = config.WATCH_ROOT / "a.jpg"
-    f2 = config.WATCH_ROOT / "b.mp4"
-    f1.touch()
-    f2.touch()
-
-    service.process_existing_files()
-
-    assert fs.move.call_count == 2

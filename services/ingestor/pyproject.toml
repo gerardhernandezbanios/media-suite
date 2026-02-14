@@ -16,12 +16,15 @@ ruff = "^0.5.3"
 black = "^24.1.1"
 mypy = "^1.8.0"
 pytest = "^8.0.0"
+pytest-clarity = "^1.0.1"
+pytest-rich = "^0.2.0"
 
 [tool.poetry.scripts]
 ingestor = "ingestor.main:run"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
+addopts = "--color=yes --assert=plain --rich --tb=short"
 
 [tool.black]
 line-length = 88

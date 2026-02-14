@@ -1,68 +1,60 @@
+# ingestor/application/service.py
 from pathlib import Path
 
-from ingestor.config import Config
-from ingestor.domain.classifier import Classifier
-from ingestor.domain.file_inspector import FileInspector
 from ingestor.domain.mover import compute_destination, compute_unique_name
-from ingestor.domain.renamer import Renamer
-from ingestor.infrastructure.file_system import FileSystem
-from ingestor.infrastructure.zip_extractor import ZipExtractor
+from ingestor.infrastructure.logging.logger import get_logger
 
+_logger = get_logger(__name__)
 
 class IngestService:
-    def __init__(self, logger):
+    def __init__(self, logger, inspector, classifier, renamer, fs, zip_extractor, config,
+    ):
         self.logger = logger
-        self.inspector = FileInspector()
-        self.classifier = Classifier()
-        self.renamer = Renamer()
-        self.fs = FileSystem()
-        self.zip = ZipExtractor()
+        self.inspector = inspector
+        self.classifier = classifier
+        self.renamer = renamer
+        self.fs = fs
+        self.zip = zip_extractor
+        self.config = config
+
+        self.CATEGORY_ROOTS = {
+            "images": config.IMAGES_ROOT,
+            "videos": config.VIDEOS_ROOT,
+            "animations": config.ANIMATIONS_ROOT,
+            "archives": config.UNSUPPORTED_ROOT,
+            "unsupported": config.UNSUPPORTED_ROOT,
+        }
 
     def process_file(self, path: Path):
+        _logger.info(f"Processing file: {path}")
+
         info = self.inspector.inspect(path)
 
-        # 1. Directorios no se procesan
         if info.is_directory:
             return
 
-        # 2. ZIP → extraer y reinyectar
         if info.is_archive:
-            extracted = self.zip.extract(path, Config.SOURCE_DIR)
+            extracted = self.zip.extract(path, self.config.SOURCE_DIR)
             for f in extracted:
                 self.process_file(f)
             return
 
-        # 3. Normalizar nombre
         normalized = self.renamer.normalize(path)
         if normalized != path:
             path.rename(normalized)
             path = normalized
 
-        # 4. Clasificación
         category = self.classifier.classify(info)
-
-        # 5. Seleccionar raíz según categoría
         root = self._select_root(category)
 
-        # 6. Calcular destino final (root/YYYY/MM)
-        dest_dir = compute_destination(path, root, category)
-
-        # 7. Evitar colisiones
+        dest_dir = compute_destination(path, root)
         final_path = compute_unique_name(dest_dir, path)
 
-        # 8. Mover archivo
         self.fs.move(path, final_path)
-
-        # 9. Registrar
-        self.logger.log_ingest(path, final_path, category)
-
-    CATEGORY_ROOTS = {
-        "images": Config.IMAGES_ROOT,
-        "videos": Config.VIDEOS_ROOT,
-        "animations": Config.ANIMATIONS_ROOT,
-        "archives": Config.UNSUPPORTED_ROOT,
-        "unsupported": Config.UNSUPPORTED_ROOT,
-    }
+        if category == "unsupported":
+            self.logger.log_unsupported(path)
+        else:
+            self.logger.log_move(path, final_path, info.timestamp, info.zip_origin, category)
 
     def _select_root(self, category: str) -> Path:
-        return self.CATEGORY_ROOTS.get(category, Config.UNSUPPORTED_ROOT)
+        return self.CATEGORY_ROOTS.get(category, self.config.UNSUPPORTED_ROOT)

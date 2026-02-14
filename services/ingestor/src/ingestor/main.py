@@ -1,12 +1,28 @@
-# src/ingestor/main.py
+# ingestor/main.py
 import json
 
 from ingestor.application.service import IngestService
 from ingestor.config import Config
+from ingestor.domain.classifier import Classifier
+from ingestor.domain.file_inspector import FileInspector
+from ingestor.domain.renamer import Renamer
+from ingestor.infrastructure.file_system import FileSystem
+from ingestor.infrastructure.zip_extractor import ZipExtractor
 from ingestor.infrastructure.logging.logger import setup_logging
+from ingestor.infrastructure.logging_csv import CsvIngestLogger
 from ingestor.infrastructure.watcher import start_watcher
 
-logger = setup_logging()
+
+def build_service():
+    return IngestService(
+        logger=CsvIngestLogger(Config.LOG_FILE),
+        inspector=FileInspector(),
+        classifier=Classifier(),
+        renamer=Renamer(),
+        fs=FileSystem(),
+        zip_extractor=ZipExtractor(),
+        config=Config,
+    )
 
 
 def dump_config():
@@ -22,11 +38,9 @@ def dump_config():
     print(json.dumps(config, indent=4))
 
 
-def process_existing_files():
-    service = IngestService(logger)
+def process_existing_files(service):
     for file in Config.SOURCE_DIR.iterdir():
         if file.is_file():
-            logger.info(f"Processing existing file: {file}")
             service.process_file(file)
 
 
@@ -36,11 +50,13 @@ def run():
     Config.validate()
     dump_config()
 
+    service = build_service()
+
     print("📂 Processing existing files...")
-    process_existing_files()
+    process_existing_files(service)
 
     print("👀 Starting watcher...")
-    start_watcher()
+    start_watcher(service, Config)
 
 
 if __name__ == "__main__":

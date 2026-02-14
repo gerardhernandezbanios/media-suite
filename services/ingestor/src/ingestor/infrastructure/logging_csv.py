@@ -16,8 +16,8 @@ class CsvIngestLogger(IngestLogger):
             writer = csv.writer(f)
             writer.writerow(row)
 
-    def log_move(self, src, dst, timestamp, zip_origin):
-        self._write_row([str(src), str(dst), timestamp.isoformat(), zip_origin or ""])
+    def log_move(self, src, dst, timestamp, zip_origin, category):
+        self._write_row([str(src), str(dst), timestamp.isoformat(), zip_origin or "", category])
 
     def log_unsupported(self, file):
-        self._write_row([str(file), "unsupported", datetime.now().isoformat(), ""])
+        self._write_row([str(file), "unsupported", datetime.now().isoformat(), "", "unsupported"])

@@ -7,7 +7,7 @@ from pathlib import Path
 class IngestLogger(ABC):
     @abstractmethod
     def log_move(
-        self, src: Path, dst: Path, timestamp: datetime, zip_origin: str | None
+        self, src: Path, dst: Path, timestamp: datetime, zip_origin: str | None, category: str
     ):
         """Log a successful file move."""
         pass
