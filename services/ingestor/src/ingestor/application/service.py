@@ -54,7 +54,10 @@ class IngestService:
         if category == "unsupported":
             self.logger.log_unsupported(path)
         else:
-            self.logger.log_move(path, final_path, info.timestamp, info.zip_origin, category)
+            self.logger.log_move(path, final_path, info.mime, category)
+
+        if info.is_archive:
+            self.zip.cleanup(path, self.config.SOURCE_DIR)
 
     def _select_root(self, category: str) -> Path:
         return self.CATEGORY_ROOTS.get(category, self.config.UNSUPPORTED_ROOT)

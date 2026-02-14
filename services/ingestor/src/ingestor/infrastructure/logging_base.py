@@ -1,13 +1,12 @@
 # src/ingestor/infrastructure/logging_base.py
 from abc import ABC, abstractmethod
-from datetime import datetime
 from pathlib import Path
 
 
 class IngestLogger(ABC):
     @abstractmethod
     def log_move(
-        self, src: Path, dst: Path, timestamp: datetime, zip_origin: str | None, category: str
+        self, src: Path, dst: Path, mime: str, category: str
     ):
         """Log a successful file move."""
         pass
