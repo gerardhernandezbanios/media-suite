@@ -1,5 +1,7 @@
 from pathlib import Path
-from collections import defaultdict
+from typing import Dict, List
+import imagehash
+
 
 class DuplicateDetector:
     """
@@ -9,15 +11,25 @@ class DuplicateDetector:
         self.hasher = hasher
 
     def find_duplicates(self, files: list[Path]) -> dict[str, list[Path]]:
-        groups = defaultdict(list)
-
+        hashes: Dict[imagehash.ImageHash, List[Path]] = {}  # hash -> list of files
         for f in files:
             if not f.is_file():
                 continue
 
-            hash_value = self.hasher.compute(f)
-            if hash_value:
-                groups[hash_value].append(f)
+            h = self.hasher.compute_raw(f)  # devuelve ImageHash, no string
+            if h is None:
+                continue
 
-        # Solo devolvemos grupos con más de un archivo
-        return {h: g for h, g in groups.items() if len(g) > 1}
+            # Buscar si ya existe un hash idéntico
+            found = False
+            for existing_hash in hashes:
+                if h - existing_hash == 0:  # distancia Hamming exacta
+                    hashes[existing_hash].append(f)
+                    found = True
+                    break
+
+            if not found:
+                hashes[h] = [f]
+
+        # Filtrar solo grupos con duplicados
+        return {str(h): g for h, g in hashes.items() if len(g) > 1}

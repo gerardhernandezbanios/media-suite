@@ -14,7 +14,7 @@
       },
       "justMyCode": true
     },
-        {
+    {
       "name": "Debug deduper",
       "type": "debugpy",
       "request": "launch",
@@ -25,8 +25,25 @@
       "env": {
         "PYTHONPATH": "${workspaceFolder}/services/deduper/src"
       },
-      "args": ["2020", "12"],
+      //"args": ["2020", "12"],
+      "args": [
+        "${input:year}", 
+        "${input:month}"],
       "justMyCode": true
+    }
+  ],
+  "inputs": [
+    {
+      "id": "year",
+      "type": "promptString",
+      "description": "Año a procesar",
+      "default": "2020"
+    },
+    {
+      "id": "month",
+      "type": "promptString",
+      "description": "Mes a procesar (01-12)",
+      "default": "12"
     }
   ]
 }

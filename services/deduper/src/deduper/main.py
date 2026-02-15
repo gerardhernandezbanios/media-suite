@@ -45,7 +45,7 @@ def run():
         return
 
     service = build_service()
-    service.run(folder)
+    service.run(folder, year, month)
 
 
 if __name__ == "__main__":

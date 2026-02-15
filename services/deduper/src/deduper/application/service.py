@@ -1,5 +1,4 @@
 from pathlib import Path
-from datetime import datetime
 
 class DeduplicationService:
     """
@@ -11,7 +10,7 @@ class DeduplicationService:
         self.logger = logger
         self.config = config
 
-    def run(self, root: Path):
+    def run(self, root: Path, year: int, month: int):
         self.logger.info(f"🔍 Buscando duplicados en: {root}")
 
         files = list(root.rglob("*"))
@@ -21,8 +20,8 @@ class DeduplicationService:
             self.logger.info("✔️ No se han encontrado duplicados.")
             return
 
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
-        batch_dir = self.config.DUPLICATES_ROOT / timestamp
+        batch_dir = self.config.DUPLICATES_ROOT / str(year) / f"{month:02d}"
+        batch_dir.mkdir(parents=True, exist_ok=True)
 
         for hash_value, group in duplicates.items():
             original = group[0]

@@ -12,3 +12,10 @@ class Hasher:
                 return str(imagehash.dhash(img))
         except Exception:
             return None
+
+    def compute_raw(self, path: Path):
+        try:
+            with Image.open(path) as img:
+                return imagehash.dhash(img)
+        except Exception:
+            return None
