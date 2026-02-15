@@ -32,11 +32,16 @@ class IngestService:
 
         if info.is_directory:
             return
-
+    
         if info.is_archive:
-            extracted = self.zip.extract(path, self.config.SOURCE_DIR)
-            for f in extracted:
-                self.process_file(f)
+            try:
+                self._process_archive(path)
+            except Exception as e:
+                self.logger.log_unsupported(path)
+                _logger.error(f"Error processing archive {path}: {e}")
+                return
+
+            path.unlink()
             return
 
         normalized = self.renamer.normalize(path)
@@ -51,13 +56,17 @@ class IngestService:
         final_path = compute_unique_name(dest_dir, path)
 
         self.fs.move(path, final_path)
+
         if category == "unsupported":
             self.logger.log_unsupported(path)
         else:
             self.logger.log_move(path, final_path, info.mime, category)
 
-        if info.is_archive:
-            self.zip.cleanup(path, self.config.SOURCE_DIR)
+    def _process_archive(self, path: Path):
+        with self.zip.extract(path) as extracted:
+            for f in extracted:
+                self.process_file(f)
+
 
     def _select_root(self, category: str) -> Path:
         return self.CATEGORY_ROOTS.get(category, self.config.UNSUPPORTED_ROOT)
