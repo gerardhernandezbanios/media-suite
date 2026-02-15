@@ -13,6 +13,20 @@
         "PYTHONPATH": "${workspaceFolder}/services/ingestor/src"
       },
       "justMyCode": true
+    },
+        {
+      "name": "Debug deduper",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "deduper.main",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/infra/.env",
+      "cwd": "${workspaceFolder}/services/deduper/src",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/services/deduper/src"
+      },
+      "args": ["2020", "12"],
+      "justMyCode": true
     }
   ]
 }

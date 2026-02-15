@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "deduper"
+version = "0.1.0"
+description = "Servicio de deduplicación de ficheros para suite-media"
+authors = ["Gerard <you@example.com>"]
+readme = "README.md"
+packages = [{ include = "deduper", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+Pillow = "^10.0.0"
+ImageHash = "^4.3.1"
+python-dotenv = "^1.0.1"
+
+
+[tool.poetry.scripts]
+deduper = "deduper.main:run"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
