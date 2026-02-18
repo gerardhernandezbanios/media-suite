@@ -2,6 +2,30 @@
 name: media-suite
 
 services:
+
+  db-postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: media
+      POSTGRES_PASSWORD: media
+      POSTGRES_DB: media_suite
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ../services/db/sql:/docker-entrypoint-initdb.d
+
+  db-service:
+    build: ../services/db
+    env_file:
+      - .env
+    environment:
+      DB_URL: ${DB_URL}
+    ports:
+      - "8002:8000"
+    depends_on:
+      - db-postgres
+
   ingestor:
     build: ../services/ingestor
     env_file:
@@ -9,3 +33,6 @@ services:
     volumes:
       - ${MEDIA_DISK}:/data:rw
     restart: unless-stopped
+
+volumes:
+  db_data:
