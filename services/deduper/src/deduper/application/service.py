@@ -20,6 +20,7 @@ class DeduplicationService:
             self.logger.info("✔️ No se han encontrado duplicados.")
             return
 
+        # Crear carpeta de destino para este batch basada en año/mes
         batch_dir = self.config.DUPLICATES_ROOT / str(year) / f"{month:02d}"
         batch_dir.mkdir(parents=True, exist_ok=True)
 

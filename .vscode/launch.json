@@ -30,6 +30,25 @@
         "${input:year}", 
         "${input:month}"],
       "justMyCode": true
+    },
+    {
+      "name": "Debug deduper (CLI)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "deduper.cli",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "envFile": "${workspaceFolder}/infra/.env",
+      "cwd": "${workspaceFolder}/services/deduper/src",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/services/deduper/src"
+      },
+      "args": [
+        "stats",
+        "${input:year}",
+        "${input:month}"
+      ],
+      "justMyCode": true
     }
   ],
   "inputs": [
@@ -43,7 +62,7 @@
       "id": "month",
       "type": "promptString",
       "description": "Mes a procesar (01-12)",
-      "default": "12"
+      "default": ""
     }
   ]
 }
