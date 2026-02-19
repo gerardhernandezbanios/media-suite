@@ -1,0 +1,41 @@
+[tool.poetry]
+name = "media-suite-db"
+version = "0.1.0"
+description = "Servicio DB de Media Suite con FastAPI, SQLAlchemy async y arquitectura limpia"
+authors = ["Gerard <gerard@example.com>"]
+readme = "README.md"
+packages = [
+    { include = "db", from = "src" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+# Web API
+fastapi = "^0.115.0"
+uvicorn = { extras = ["standard"], version = "^0.30.0" }
+
+# DB async
+sqlalchemy = "^2.0.30"
+asyncpg = "^0.29.0"
+
+# Pydantic
+pydantic = "^2.7.0"
+pydantic-settings = "^2.2.1"
+
+# Alembic (opcional pero útil)
+alembic = "^1.13.1"
+
+# Otros
+python-dotenv = "^1.0.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.0"
+pytest-asyncio = "^0.23.0"
+black = "^24.4.0"
+isort = "^5.13.2"
+mypy = "^1.10.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

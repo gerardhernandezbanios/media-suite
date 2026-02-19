@@ -23,7 +23,10 @@
     }
   },
   "remoteUser": "vscode",
-  "runArgs": ["--env-file","infra/.env"],
+  "runArgs": [
+    "--network=media-suite-net",
+    "--env-file", "infra/.env"
+  ],
   "mounts": [
     "source=/host_mnt/d/Gerard,target=/data,type=bind"
   ]

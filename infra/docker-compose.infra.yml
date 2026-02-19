@@ -1,0 +1,23 @@
+
+networks:
+  media-suite-net:
+    external: true
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: media-postgres
+    environment:
+      POSTGRES_USER: media
+      POSTGRES_PASSWORD: media
+      POSTGRES_DB: media_suite
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../services/db/sql:/docker-entrypoint-initdb.d
+    networks:
+      - media-suite-net
+
+volumes:
+  postgres_data:
