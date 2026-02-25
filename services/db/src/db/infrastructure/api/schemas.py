@@ -20,3 +20,6 @@ class PhotoHashesUpdateDTO(BaseModel):
     phash: Optional[str] = None
     ahash: Optional[str] = None
     dhash: Optional[str] = None
+
+class PhotoBatchCreateDTO(BaseModel):
+    paths: List[str]

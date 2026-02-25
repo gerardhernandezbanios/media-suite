@@ -10,6 +10,7 @@ python = "^3.12"
 Pillow = "^10.2.0"
 watchdog = "^4.0.0"
 filetype = "^1.2.0"
+shared = {path = "../shared"}
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.5.3"

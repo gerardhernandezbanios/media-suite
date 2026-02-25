@@ -1,10 +1,9 @@
 # ingestor/infrastructure/watcher.py
+import asyncio
 import time
 from pathlib import Path
-
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver as Observer
-
 from ingestor.infrastructure.logging.logger import get_logger
 
 logger = get_logger(__name__)
@@ -17,7 +16,11 @@ class IngestEventHandler(FileSystemEventHandler):
     def on_created(self, event):
         if not event.is_directory:
             logger.info(f"New file detected: {event.src_path}")
-            self.service.process_file(Path(event.src_path))
+
+            # Ejecutamos la corutina sin bloquear watchdog
+            asyncio.create_task(
+                self.service.process_file(Path(event.src_path))
+            )
 
 
 def start_watcher(service, config):

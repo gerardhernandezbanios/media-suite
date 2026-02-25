@@ -13,6 +13,13 @@ async def register_photo(path: str, session: AsyncSession):
     await session.commit()
     return photo
 
+async def register_photos_batch(paths: list[str], session: AsyncSession):
+    photos = []
+    for path in paths:
+        photo = await register_photo(path, session)
+        photos.append(photo)
+    return photos
+
 async def update_photo_hashes(photo_id: UUID, phash: str | None, ahash: str | None, dhash: str | None, session: AsyncSession):
     repo = PhotoRepository(session)
     await repo.update_hashes(photo_id, phash, ahash, dhash)

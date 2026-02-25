@@ -23,6 +23,9 @@ class Config:
     LOG_FILE: Path = get_env_path("LOG_FILE")
     AUDIT_FILE: Path = get_env_path("AUDIT_FILE")
 
+    # URL del servicio de database
+    DB_SERVICE_URL: str = os.getenv("DB_SERVICE_URL", default="http://db:8000")
+
     # Extensiones soportadas
     IMAGE_EXTENSIONS: list[str] = [
         "jpg",

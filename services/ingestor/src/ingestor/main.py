@@ -1,4 +1,5 @@
 # ingestor/main.py
+import asyncio
 import json
 
 from ingestor.application.service import IngestService
@@ -11,6 +12,7 @@ from ingestor.infrastructure.zip_extractor import ZipExtractor
 from ingestor.infrastructure.logging.logger import setup_logging
 from ingestor.infrastructure.logging_csv import CsvIngestLogger
 from ingestor.infrastructure.watcher import start_watcher
+from ingestor.infrastructure.db_client import build_photo_repository
 
 
 def build_service():
@@ -22,6 +24,7 @@ def build_service():
         fs=FileSystem(),
         zip_extractor=ZipExtractor(),
         config=Config,
+        photo_repo=build_photo_repository(Config)
     )
 
 
@@ -33,18 +36,19 @@ def dump_config():
         "ANIMATIONS_ROOT": str(Config.ANIMATIONS_ROOT),
         "LOG_FILE": str(Config.LOG_FILE),
         "AUDIT_FILE": str(Config.AUDIT_FILE),
+        "DB_SERVICE_URL": str(Config.DB_SERVICE_URL),
     }
     print("Current configuration:")
     print(json.dumps(config, indent=4))
 
 
-def process_existing_files(service):
+async def process_existing_files(service):
     for file in Config.SOURCE_DIR.iterdir():
         if file.is_file():
-            service.process_file(file)
+            await service.process_file(file)
 
 
-def run():
+async def run_async():
     print("🚀 Starting ingestor service...")
 
     Config.validate()
@@ -53,10 +57,14 @@ def run():
     service = build_service()
 
     print("📂 Processing existing files...")
-    process_existing_files(service)
+    await process_existing_files(service)
 
     print("👀 Starting watcher...")
     start_watcher(service, Config)
+
+
+def run():
+    asyncio.run(run_async())
 
 
 if __name__ == "__main__":
