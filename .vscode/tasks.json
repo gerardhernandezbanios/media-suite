@@ -2,6 +2,15 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Mostrar estructura limpia",
+      "type": "shell",
+      "command": "tree -I \"__pycache__|\\.pytest_cache|\\.mypy_cache|\\.venv|venv|.*\\.egg-info|dist|build|tests|\\.git|\\.vscode\"",
+      "options": {
+        "cwd": "${workspaceFolder}/services"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "Run ingestor (manual)",
       "type": "shell",
       "command": "poetry run python -m main",

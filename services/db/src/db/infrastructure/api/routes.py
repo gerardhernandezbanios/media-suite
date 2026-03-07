@@ -13,13 +13,12 @@ from db.application.use_cases import (
 )
 from db.infrastructure.db.repositories import PhotoRepository
 from db.domain.models import Photo
-from db.infrastructure.api.schemas import (
+from shared.dto.schemas import (
     PhotoBatchCreateDTO,
     PhotoCreateDTO,
     PhotoDTO,
     PhotoTagsUpdateDTO,
-    PhotoHashesUpdateDTO,
-    PhotoBatchCreateDTO
+    PhotoHashesUpdateDTO
 )
 
 router = APIRouter()
@@ -36,7 +35,6 @@ async def create_photos_batch(
 ):
     photos = await register_photos_batch(dto.paths, session)
     return [PhotoDTO(id=p.id, path=p.path) for p in photos]
-
 
 @router.get("/photos/{photo_id}", response_model=PhotoDTO)
 async def get_photo(photo_id: UUID, session: AsyncSession = Depends(get_session)):

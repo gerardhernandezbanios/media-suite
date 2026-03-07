@@ -28,6 +28,7 @@ alembic = "^1.13.1"
 
 # Otros
 python-dotenv = "^1.0.1"
+shared = {path = "../shared"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.0"
