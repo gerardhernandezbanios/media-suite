@@ -8,21 +8,32 @@ packages = [{ include = "ingestor", from = "src" }]
 [tool.poetry.dependencies]
 python = "^3.12"
 Pillow = "^10.2.0"
+watchdog = "^4.0.0"
+filetype = "^1.2.0"
+shared = {path = "../shared"}
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.3.0"
+ruff = "^0.5.3"
 black = "^24.1.1"
 mypy = "^1.8.0"
 pytest = "^8.0.0"
+pytest-clarity = "^1.0.1"
+pytest-rich = "^0.2.0"
 
 [tool.poetry.scripts]
 ingestor = "ingestor.main:run"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+addopts = "--color=yes --assert=plain --rich --tb=short"
 
 [tool.black]
 line-length = 88
 
 [tool.ruff]
 line-length = 88
+
+[tool.ruff.lint]
 select = ["E", "F", "W", "I"]
 ignore = ["E501"]
 

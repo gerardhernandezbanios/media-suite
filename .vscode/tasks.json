@@ -1,0 +1,66 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Mostrar estructura limpia",
+      "type": "shell",
+      "command": "tree -I \"__pycache__|\\.pytest_cache|\\.mypy_cache|\\.venv|venv|.*\\.egg-info|dist|build|tests|\\.git|\\.vscode\"",
+      "options": {
+        "cwd": "${workspaceFolder}/services"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run ingestor (manual)",
+      "type": "shell",
+      "command": "poetry run python -m main",
+      "options": {
+        "cwd": "${workspaceFolder}/services/ingestor/src"
+      }
+    },
+    {
+      "label": "Lint (ruff)",
+      "type": "shell",
+      "command": "poetry run ruff check .",
+      "options": {
+        "cwd": "${workspaceFolder}/services/ingestor"
+      },
+      "problemMatcher": "$python"
+    },
+    {
+      "label": "Lint (ruff fix)",
+      "type": "shell",
+      "command": "poetry run ruff check . --fix",
+      "options": {
+        "cwd": "${workspaceFolder}/services/ingestor"
+      },
+      "problemMatcher": "$python"
+    },
+    {
+      "label": "Format (black)",
+      "type": "shell",
+      "command": "poetry run black .",
+      "options": {
+        "cwd": "${workspaceFolder}/services/ingestor"
+      }
+    },
+    {
+      "label": "Type check (mypy)",
+      "type": "shell",
+      "command": "poetry run mypy src",
+      "problemMatcher": "$python",
+      "options": {
+        "cwd": "${workspaceFolder}/services/ingestor"
+      }
+    },
+    {
+      "label": "Run tests",
+      "type": "shell",
+      "command": "poetry run pytest",
+      "problemMatcher": "$python",
+      "options": {
+        "cwd": "${workspaceFolder}/services/ingestor"
+      }
+    }
+  ]
+}

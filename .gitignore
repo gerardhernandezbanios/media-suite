@@ -10,7 +10,6 @@ poetry.lock
 .venv/
 
 # VS Code
-.vscode/
 .history/
 
 # Devcontainer
@@ -27,3 +26,22 @@ pytest_cache/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Environment variables
+.env
+
+# mypy cache
+.mypy_cache/
+
+# ruff cache
+.ruff_cache/
+
+# pytest cache
+.pytest_cache/
+
+# Python packaging artifacts
+*.egg-info/
+*.egg
+dist/
+build/
+src/ingestor.egg-info/

@@ -1,0 +1,104 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug ingestor",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "ingestor.main",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/infra/.env",
+      "cwd": "${workspaceFolder}/services/ingestor/src",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/services/ingestor/src"
+      },
+      "justMyCode": true
+    },
+    {
+      "name": "Debug deduper",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "deduper.main",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/infra/.env",
+      "cwd": "${workspaceFolder}/services/deduper/src",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/services/deduper/src"
+      },
+      //"args": ["2020", "12"],
+      "args": [
+        "${input:year}",
+        "${input:month}"
+      ],
+      "justMyCode": true
+    },
+    {
+      "name": "Debug deduper (CLI)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "deduper.cli",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "envFile": "${workspaceFolder}/infra/.env",
+      "cwd": "${workspaceFolder}/services/deduper/src",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/services/deduper/src"
+      },
+      "args": [
+        "stats",
+        "${input:year}",
+        "${input:month}"
+      ],
+      "justMyCode": true
+    },
+    {
+      "name": "Debug DB Service",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "db.main",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/infra/.env",
+      "cwd": "${workspaceFolder}/services/db/src",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/services/db/src"
+      },
+      "justMyCode": true
+    },
+    {
+      "name": "Debug DB (Uvicorn)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "python": "${workspaceFolder}/services/db/.venv/bin/python",
+      "args": [
+        "db.main:app",
+        "--reload",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000"
+      ],
+      "envFile": "${workspaceFolder}/infra/.env",
+      "cwd": "${workspaceFolder}/services/db/src",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/services/db/src"
+      },
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ],
+  "inputs": [
+    {
+      "id": "year",
+      "type": "promptString",
+      "description": "Año a procesar",
+      "default": "2020"
+    },
+    {
+      "id": "month",
+      "type": "promptString",
+      "description": "Mes a procesar (01-12)",
+      "default": ""
+    }
+  ]
+}

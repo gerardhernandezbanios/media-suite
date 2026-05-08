@@ -22,5 +22,12 @@
       ]
     }
   },
-  "remoteUser": "vscode"
+  "remoteUser": "vscode",
+  "runArgs": [
+    "--network=media-suite-net",
+    "--env-file", "${localWorkspaceFolder}/infra/.env"
+  ],
+  "mounts": [
+    "source=D:\\Gerard,target=/data,type=bind"
+  ]
 }
