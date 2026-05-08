@@ -1,4 +1,5 @@
 from unittest.mock import Mock
+
 import pytest
 from ingestor.application.service import IngestService
 
@@ -51,7 +52,7 @@ def test_ingest_directory(service, fs, config, tmp_path):
     src.mkdir()
 
     service.process_file(src)
-    
+
     fs.move.assert_not_called()
 
 def test_ingest_image(service, fs, config, tmp_path):

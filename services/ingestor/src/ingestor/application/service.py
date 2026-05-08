@@ -1,8 +1,8 @@
 # ingestor/application/service.py
 from pathlib import Path
+
 from ingestor.domain.mover import compute_destination, compute_unique_name
 from ingestor.infrastructure.logging.logger import get_logger
-from shared.domain.repositories import PhotoRepository
 
 _logger = get_logger(__name__)
 
@@ -15,8 +15,7 @@ class IngestService:
         renamer,
         fs,
         zip_extractor,
-        config,
-        photo_repo: PhotoRepository
+        config
     ):
         self.logger = logger
         self.inspector = inspector
@@ -25,7 +24,6 @@ class IngestService:
         self.fs = fs
         self.zip = zip_extractor
         self.config = config
-        self.photo_repo = photo_repo
 
         # Buffer interno para registrar al final
         self._pending_registrations: list[str] = []
@@ -103,10 +101,10 @@ class IngestService:
         if not self._pending_registrations:
             return
 
-        try:
-            await self.photo_repo.register_photos(self._pending_registrations)
-            _logger.info(f"Registered {len(self._pending_registrations)} photos in DB")
-        except Exception as e:
-            _logger.error(f"Error registering photos: {e}")
+        # try:
+        #     await self.photo_repo.register_photos(self._pending_registrations)
+        #     _logger.info(f"Registered {len(self._pending_registrations)} photos in DB")
+        # except Exception as e:
+        #     _logger.error(f"Error registering photos: {e}")
 
         self._pending_registrations.clear()

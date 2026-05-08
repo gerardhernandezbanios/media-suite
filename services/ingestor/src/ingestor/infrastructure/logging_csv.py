@@ -1,6 +1,5 @@
 # src/ingestor/infrastructure/logging_csv.py
 import csv
-from datetime import datetime
 from pathlib import Path
 
 from ingestor.infrastructure.logging_base import IngestLogger

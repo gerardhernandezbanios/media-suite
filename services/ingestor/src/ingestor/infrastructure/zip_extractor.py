@@ -1,9 +1,10 @@
 # ingestor/infrastructure/zip_extractor.py
-from contextlib import contextmanager
-from pathlib import Path
 import shutil
 import tempfile
 import zipfile
+from contextlib import contextmanager
+from pathlib import Path
+
 
 class ZipExtractor:
     def __init__(self, work_dir: Path | None = None):

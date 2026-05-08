@@ -1,5 +1,6 @@
 import httpx
 
+
 class HttpClient:
 
     def __init__(self, base_url: str, timeout: float = 10.0):

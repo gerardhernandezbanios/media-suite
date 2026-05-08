@@ -1,6 +1,6 @@
 # ingestor/domain/mover.py
 from pathlib import Path
-from datetime import datetime
+
 from ingestor.domain.exif_reader import get_exif_date
 
 

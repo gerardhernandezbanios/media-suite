@@ -1,6 +1,7 @@
 # ingestor/main.py
 import asyncio
 import json
+from pathlib import Path
 
 from ingestor.application.service import IngestService
 from ingestor.config import Config
@@ -8,11 +9,9 @@ from ingestor.domain.classifier import Classifier
 from ingestor.domain.file_inspector import FileInspector
 from ingestor.domain.renamer import Renamer
 from ingestor.infrastructure.file_system import FileSystem
-from ingestor.infrastructure.zip_extractor import ZipExtractor
-from ingestor.infrastructure.logging.logger import setup_logging
 from ingestor.infrastructure.logging_csv import CsvIngestLogger
 from ingestor.infrastructure.watcher import start_watcher
-from ingestor.infrastructure.db_client import build_photo_repository
+from ingestor.infrastructure.zip_extractor import ZipExtractor
 
 
 def build_service():
@@ -23,8 +22,7 @@ def build_service():
         renamer=Renamer(),
         fs=FileSystem(),
         zip_extractor=ZipExtractor(),
-        config=Config,
-        photo_repo=build_photo_repository(Config)
+        config=Config
     )
 
 
@@ -42,10 +40,19 @@ def dump_config():
     print(json.dumps(config, indent=4))
 
 
-async def process_existing_files(service):
+async def process_existing_files_root(service):
     for file in Config.SOURCE_DIR.iterdir():
-        if file.is_file():
-            await service.process_file(file)
+        await process_existing_files(file, service)
+        # if file.is_file():
+        #     await service.process_file(file)
+
+
+async def process_existing_files(path: Path, service: IngestService):
+    if path.is_file():
+        await service.process_file(path)
+    elif path.is_dir():
+        for file in path.iterdir():
+            await process_existing_files(file, service)
 
 
 async def run_async():
@@ -57,7 +64,7 @@ async def run_async():
     service = build_service()
 
     print("📂 Processing existing files...")
-    await process_existing_files(service)
+    await process_existing_files_root(service)
 
     print("👀 Starting watcher...")
     start_watcher(service, Config)

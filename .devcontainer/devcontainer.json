@@ -25,9 +25,9 @@
   "remoteUser": "vscode",
   "runArgs": [
     "--network=media-suite-net",
-    "--env-file", "infra/.env"
+    "--env-file", "${localWorkspaceFolder}/infra/.env"
   ],
   "mounts": [
-    "source=/host_mnt/d/Gerard,target=/data,type=bind"
+    "source=D:\\Gerard,target=/data,type=bind"
   ]
 }
