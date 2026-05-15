@@ -1,0 +1,42 @@
+[tool.poetry]
+name = "media-suite-backend"
+version = "0.1.0"
+description = "Backend for Media Suite (photos/videos ingestion, hashing, API)"
+authors = ["Gerard"]
+readme = "README.md"
+packages = [{ include = "app" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.110.0"
+uvicorn = { extras = ["standard"], version = "^0.29.0" }
+sqlalchemy = "^2.0.29"
+asyncpg = "^0.29.0"
+pydantic = "^2.7.0"
+python-multipart = "^0.0.9"
+pillow = "^10.3.0"
+imagehash = "^4.3.1"
+dependency-injector = "^4.41.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.0"
+pytest-asyncio = "^0.23.6"
+black = "^24.3.0"
+ruff = "^0.3.5"
+mypy = "^1.9.0"
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "I"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry-core.masonry.api"
