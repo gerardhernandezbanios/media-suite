@@ -9,7 +9,7 @@ from app.media.infrastructure.ingestor.processor import IngestorProcessor
 from app.media.infrastructure.hashing.sha256 import compute_sha256
 from app.media.infrastructure.hashing.perceptual import compute_phash
 from app.media.infrastructure.db.repositories import MediaRepository
-from app.media.infrastructure.db.models import MediaItemModel
+from app.media.infrastructure.db.models import MediaItemModel, MediaMetadataModel
 from app.media.domain.entities import MediaType
 from app.media.infrastructure.exif.extractor import ExifExtractor
 
@@ -76,6 +76,30 @@ class UploadMediaService:
 
             await self.repo.add(model)
             saved_items.append(model)
+
+            # 6- Crear 
+            metadata_model = MediaMetadataModel(
+                media_id=model.id,
+                width=exif.width if exif else None,
+                height=exif.height if exif else None,
+                orientation=exif.orientation if exif else None,
+                camera_make=exif.camera_make if exif else None,
+                camera_model=exif.camera_model if exif else None,
+                lens_model=None,
+                iso=None,
+                aperture=None,
+                shutter_speed=None,
+                focal_length=None,
+                created_at=exif.created_at if exif else None,
+                duration=None,
+                video_codec=None,
+                audio_codec=None,
+                frame_rate=None,
+                bit_rate=None,
+            )
+
+            self.session.add(metadata_model)
+
 
 
         return saved_items
