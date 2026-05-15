@@ -11,6 +11,8 @@ from app.media.infrastructure.hashing.perceptual import compute_phash
 from app.media.infrastructure.db.repositories import MediaRepository
 from app.media.infrastructure.db.models import MediaItemModel
 from app.media.domain.entities import MediaType
+from app.media.infrastructure.exif.extractor import ExifExtractor
+
 
 
 @dataclass
@@ -24,6 +26,7 @@ class UploadMediaService:
         self.repo = repo
         self.storage = FilesystemStorage()
         self.ingestor = IngestorProcessor()
+        self.exif = ExifExtractor()
 
     async def execute(self, cmd: UploadMediaCommand):
         # 1. Guardar temporalmente
@@ -35,22 +38,28 @@ class UploadMediaService:
         saved_items = []
 
         for path in paths:
-            # 3. Determinar tipo
             media_type = self._detect_type(path)
 
-            # 4. Extraer fecha de creación
-            created_at = self._extract_created_at(path)
+            # 1. EXIF (solo imágenes)
+            exif = self.exif.extract(path) if media_type == MediaType.IMAGE else None
 
-            # 5. Mover a ubicación final
+            # 2. Fecha de creación
+            created_at = (
+                exif.created_at
+                if exif and exif.created_at
+                else self._extract_created_at(path)
+            )
+
+            # 3. Mover a ubicación final
             final_path = self.storage.move_to_final_location(
                 path, media_type.value, created_at
             )
 
-            # 6. Hashes
+            # 4. Hashes
             sha256 = compute_sha256(final_path)
             phash = compute_phash(final_path) if media_type == MediaType.IMAGE else None
 
-            # 7. Crear modelo DB
+            # 5. Crear modelo DB
             model = MediaItemModel(
                 type=media_type,
                 filename=final_path.name,
@@ -58,8 +67,8 @@ class UploadMediaService:
                 sha256=sha256,
                 phash=phash,
                 size_bytes=final_path.stat().st_size,
-                width=None,
-                height=None,
+                width=exif.width if exif else None,
+                height=exif.height if exif else None,
                 duration=None,
                 created_at=created_at,
                 ingested_at=datetime.utcnow(),
@@ -67,6 +76,7 @@ class UploadMediaService:
 
             await self.repo.add(model)
             saved_items.append(model)
+
 
         return saved_items
 
