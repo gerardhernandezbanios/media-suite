@@ -1,293 +1,166 @@
-Perfecto, Gerard. Puedo darte **todo el contexto consolidado**, pero antes debo aclarar una cosa importante:
+Perfecto, Gerard. Te dejo un **contexto compacto, completo y reutilizable** para que el próximo día puedas pegarlo y continuar exactamente donde lo dejamos, sin perder nada de la arquitectura ni del diseño DDD que hemos construido.
 
-👉 **No puedo guardar este contexto automáticamente en memoria**, porque no es un dato personal, preferencia o instrucción estable que deba recordarse en futuras conversaciones.  
-Pero **sí puedo entregarte un bloque único, completo y listo para copiar**, que podrás reutilizar cuando quieras.
-
-A partir de ahora, cuando me digas *“usa el contexto”*, simplemente pégalo y seguimos desde ahí sin perder nada.
-
-Aquí tienes **el contexto completo, limpio, estructurado y actualizado** de todo lo que hemos construido hasta ahora.
+Este contexto está pensado para que tú lo pegues tal cual al iniciar la próxima sesión y yo pueda seguir desarrollando código, tests, refactors o nuevas features sin tener que reconstruir nada.
 
 ---
 
-# 📦 CONTEXTO COMPLETO DEL BACKEND *MEDIA‑SUITE*  
-*(para reutilizar en futuras sesiones)*
+# 📦 CONTEXTO RESUMIDO Y ACTUALIZADO DEL BACKEND *MEDIA‑SUITE*  
+*(versión preparada para continuar desarrollo DDD del pipeline de upload/ingestión)*
 
 ---
 
-# 1. Arquitectura general (DDD + FastAPI + Postgres + Filesystem)
+## 1. Arquitectura general (DDD + FastAPI + SQLAlchemy + Filesystem)
 
 ```
 media-suite/service/backend/
-│
-├── app/
-│   ├── core/                     # Config, logging, DI, eventos, startup
-│   ├── shared/                   # Shared Kernel
-│   ├── media/                    # Bounded context principal
-│   │   ├── domain/               # Entidades, repos, eventos
-│   │   ├── application/          # Commands, queries, services
-│   │   ├── infrastructure/       # DB, FS, hashing, ingestor, exif
-│   │   └── api/                  # Routers FastAPI
-│   ├── auth/
-│   └── recognition/
-│
-├── tests/
-├── main.py
-└── pyproject.toml
+└── app/
+    ├── core/                 # Config, DI, eventos
+    ├── shared/               # DTOs, utils, excepciones
+    ├── media/
+    │   ├── domain/           # Entidades + interfaces (puertos)
+    │   ├── application/      # Commands + Services (casos de uso)
+    │   ├── infrastructure/   # Adaptadores (DB, FS, EXIF, hashing)
+    │   └── api/              # Endpoints FastAPI
+    ├── auth/
+    └── recognition/
 ```
 
 ---
 
-# 2. Entidades de dominio
+## 2. Objetivo actual del proyecto
 
-## 2.1 MediaItem
+Estamos implementando un **pipeline de ingestión DDD puro**, capaz de:
 
-```python
-@dataclass
-class MediaItem:
-    id: Optional[int]
-    type: MediaType
-    filename: str
-    filepath: str
-    sha256: str
-    phash: Optional[str]
-    size_bytes: int
-    width: Optional[int]
-    height: Optional[int]
-    duration: Optional[float]
-    created_at: datetime
-    ingested_at: datetime
-```
+- Subir **uno o varios archivos**  
+- Subir **ZIPs con carpetas internas**  
+- Extraer ZIPs → obtener lista plana de paths  
+- Procesar cada archivo con:
+  - EXIF  
+  - SHA256  
+  - pHash  
+  - mover a librería `/media/{image|video}/{año}/{mes}/`  
+  - persistir en DB  
+- Devolver DTOs limpios
 
-## 2.2 MediaMetadata (modelo completo)
+Todo ello **separado por capas**:
 
-```python
-@dataclass
-class MediaMetadata:
-    id: Optional[int]
-    media_id: int
-
-    width: Optional[int]
-    height: Optional[int]
-    orientation: Optional[int]
-
-    camera_make: Optional[str]
-    camera_model: Optional[str]
-    lens_model: Optional[str]
-    iso: Optional[int]
-    aperture: Optional[float]
-    shutter_speed: Optional[str]
-    focal_length: Optional[float]
-    created_at: Optional[datetime]
-
-    duration: Optional[float]
-    video_codec: Optional[str]
-    audio_codec: Optional[str]
-    frame_rate: Optional[float]
-    bit_rate: Optional[int]
-```
+- **Dominio** define entidades + puertos  
+- **Application** orquesta casos de uso  
+- **Infraestructura** implementa adaptadores  
+- **API** solo expone endpoints  
 
 ---
 
-# 3. Modelos SQLAlchemy
+## 3. Dominio actual
 
-## 3.1 MediaItemModel
+### 3.1 Entidad principal: `MediaItem`
 
-```python
-class MediaItemModel(Base):
-    __tablename__ = "media_items"
+- Tiene `create_from_raw()`  
+- Decide tipo (imagen/video), fechas, dimensiones, etc.  
+- No toca infraestructura.
 
-    id = mapped_column(Integer, primary_key=True)
-    type = mapped_column(Enum(MediaType), nullable=False)
-    filename = mapped_column(String(255), nullable=False)
-    filepath = mapped_column(String(500), nullable=False)
+### 3.2 EXIF
 
-    sha256 = mapped_column(String(64), nullable=False, index=True)
-    phash = mapped_column(String(32))
+`ExifData` contiene todos los campos EXIF relevantes.
 
-    size_bytes = mapped_column(Integer, nullable=False)
-    width = mapped_column(Integer)
-    height = mapped_column(Integer)
-    duration = mapped_column(Float)
+### 3.3 Puertos (interfaces)
 
-    created_at = mapped_column(DateTime, nullable=False)
-    ingested_at = mapped_column(DateTime, nullable=False)
-
-    metadata = relationship("MediaMetadataModel", back_populates="media_item", uselist=False)
-```
-
-## 3.2 MediaMetadataModel
-
-```python
-class MediaMetadataModel(Base):
-    __tablename__ = "media_metadata"
-
-    id = mapped_column(Integer, primary_key=True)
-    media_id = mapped_column(ForeignKey("media_items.id", ondelete="CASCADE"), unique=True)
-
-    width = mapped_column(Integer)
-    height = mapped_column(Integer)
-    orientation = mapped_column(Integer)
-
-    camera_make = mapped_column(String(255))
-    camera_model = mapped_column(String(255))
-    lens_model = mapped_column(String(255))
-    iso = mapped_column(Integer)
-    aperture = mapped_column(Float)
-    shutter_speed = mapped_column(String(50))
-    focal_length = mapped_column(Float)
-    created_at = mapped_column(DateTime)
-
-    duration = mapped_column(Float)
-    video_codec = mapped_column(String(50))
-    audio_codec = mapped_column(String(50))
-    frame_rate = mapped_column(Float)
-    bit_rate = mapped_column(Integer)
-
-    media_item = relationship("MediaItemModel", back_populates="metadata")
-```
+- `ExifReader`
+- `HashCalculator`
+- `MediaStorage`
+- `MediaItemRepository`
 
 ---
 
-# 4. DTOs
+## 4. Capa de aplicación
 
-## 4.1 MediaItemDTO
+### 4.1 Commands
 
-```python
-class MediaItemDTO(BaseModel):
-    id: int
-    type: MediaTypeDTO
-    filename: str
-    filepath: str
-    sha256: str
-    phash: str | None
-    size_bytes: int
-    width: int | None
-    height: int | None
-    duration: float | None
-    created_at: datetime
-    ingested_at: datetime
-    metadata: MediaMetadataDTO | None
-```
+`IngestMediaCommand(paths: list[Path])`
 
-## 4.2 MediaMetadataDTO
+### 4.2 Services
 
-```python
-class MediaMetadataDTO(BaseModel):
-    width: int | None
-    height: int | None
-    orientation: int | None
+- **FileUploadService**  
+  Guarda temporales, detecta ZIPs, extrae ZIPs.
 
-    camera_make: str | None
-    camera_model: str | None
-    lens_model: str | None
-    iso: int | None
-    aperture: float | None
-    shutter_speed: str | None
-    focal_length: float | None
-    created_at: datetime | None
+- **IngestMediaHandler**  
+  Caso de uso principal del pipeline.  
+  Orquesta EXIF → hashing → mover archivo → persistir.
 
-    duration: float | None
-    video_codec: str | None
-    audio_codec: str | None
-    frame_rate: float | None
-    bit_rate: int | None
-```
+- **UploadMediaService**  
+  Orquestador final del endpoint:  
+  upload → expandir → ingestión → DTOs.
 
 ---
 
-# 5. Mappers
+## 5. Infraestructura
 
-## 5.1 Dominio ↔ SQLAlchemy
+### 5.1 EXIF  
+`PillowExifReader` implementa `ExifReader`.
 
-```python
-def model_to_domain(model: MediaItemModel) -> MediaItem: ...
-def domain_to_model(entity: MediaItem) -> MediaItemModel: ...
+### 5.2 Hashing  
+`DefaultHashCalculator` implementa SHA256 + pHash.
 
-def metadata_model_to_domain(model: MediaMetadataModel) -> MediaMetadata: ...
-def metadata_domain_to_model(entity: MediaMetadata) -> MediaMetadataModel: ...
-```
+### 5.3 Filesystem  
+`LibraryMediaStorage` mueve archivos a la librería final.
 
-## 5.2 Dominio ↔ DTO
-
-```python
-def domain_to_dto(entity: MediaItem) -> MediaItemDTO: ...
-def metadata_domain_to_dto(entity: MediaMetadata) -> MediaMetadataDTO: ...
-```
+### 5.4 Repositorio  
+`SqlAlchemyMediaItemRepository` implementa `MediaItemRepository`.
 
 ---
 
-# 6. Pipeline completo  
-*(upload → ingestor → EXIF → hashing → metadata → DB)*
+## 6. API
 
-## 6.1 Flujo
+### Endpoint actual:
 
-1. Guardar archivo temporal  
-2. Ingestor (ZIP o archivo normal)  
-3. Extraer EXIF (si es imagen)  
-4. Determinar fecha de creación  
-5. Mover a `/media/{image|video}/{año}/{mes}/`  
-6. Calcular SHA256  
-7. Calcular pHash (solo imágenes)  
-8. Crear `MediaItemModel`  
-9. Crear `MediaMetadataModel`  
-10. Persistir en DB  
-11. Devolver DTO  
-
-## 6.2 EXIF extractor
-
-```python
-class ExifExtractor:
-    def extract(self, path: Path) -> ExifData:
-        ...
+```
+POST /media/upload
+files: List[UploadFile]
 ```
 
----
-
-# 7. pyproject.toml (Poetry + Ruff + Black + Pytest)
-
-```toml
-[tool.poetry]
-name = "media-suite-backend"
-version = "0.1.0"
-packages = [{ include = "app" }]
-
-[tool.poetry.dependencies]
-python = "^3.11"
-fastapi = "^0.110.0"
-uvicorn = { extras = ["standard"], version = "^0.29.0" }
-sqlalchemy = "^2.0.29"
-asyncpg = "^0.29.0"
-pydantic = "^2.7.0"
-python-multipart = "^0.0.9"
-pillow = "^10.3.0"
-imagehash = "^4.3.1"
-dependency-injector = "^4.41.0"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.1.0"
-pytest-asyncio = "^0.23.6"
-black = "^24.3.0"
-ruff = "^0.3.5"
-mypy = "^1.9.0"
-```
+Llama a `UploadMediaService`.
 
 ---
 
-# ✔️ Este es tu **contexto maestro**  
-Guárdalo donde quieras.  
-Cuando quieras continuar, solo dime:
+## 7. DI (Dependency Injector)
 
-**“Usa el contexto”**  
-y pégalo.
+El contenedor registra:
+
+- FileUploadService  
+- IngestMediaHandler  
+- UploadMediaService  
+- Adaptadores EXIF, hashing, storage  
+- Repositorio SQLAlchemy  
 
 ---
 
-# ¿Qué quieres construir ahora?  
-Opciones naturales:
+## 8. Tests
 
-- procesamiento de vídeo  
-- API de búsqueda avanzada  
-- tests del pipeline  
-- migraciones Alembic
+Tenemos esqueleto para:
 
-¿Cuál seguimos?
+- **Integración**: subir ZIP → procesar → verificar DB + FS  
+- **E2E**: subir archivos reales desde `tests/data/`
+
+---
+
+# 🎯 Qué podemos continuar el próximo día
+
+Con este contexto, podemos seguir con cualquiera de estos pasos:
+
+- Implementar **tests de integración completos**  
+- Implementar **tests E2E reales**  
+- Refinar `MediaItem.create_from_raw()`  
+- Añadir **validaciones** (MIME, tamaño, extensiones)  
+- Añadir **eventos de dominio** (ej. `MediaItemIngested`)  
+- Añadir **álbumes**, **búsqueda**, **filtros**, **paginación**  
+- Añadir **watcher** para ingestión automática  
+- Añadir **deduplicación** por SHA256 o pHash  
+- Añadir **miniaturas** (thumbnails)  
+- Añadir **transcodificación de vídeo**  
+
+---
+
+# 📌 Copia y pega este contexto el próximo día  
+Con esto podré continuar exactamente donde lo dejamos, sin reconstruir nada.
+
+Cuando vuelvas, solo dime **qué quieres avanzar** y seguimos construyendo el backend como si fuera un proyecto real de producción.
