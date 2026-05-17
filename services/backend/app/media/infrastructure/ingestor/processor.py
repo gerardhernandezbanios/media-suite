@@ -4,6 +4,8 @@ from datetime import datetime
 import zipfile
 import shutil
 
+from services.backend.app.media.domain.entities import MediaItem
+
 
 class IngestorProcessor:
 
@@ -29,3 +31,11 @@ class IngestorProcessor:
 
         # devolver solo archivos (no carpetas)
         return [p for p in extract_dir.rglob("*") if p.is_file()]
+    
+    async def ingest_many(self, paths: list[Path]) -> list[MediaItem]:
+        results = []
+        for path in paths:
+            item = await self.ingest_one(path)
+            results.append(item)
+        return results
+    
