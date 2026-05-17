@@ -1,57 +1,50 @@
 # services/backend/app/media/infrastructure/exif/extractor.py
+from __future__ import annotations
+
 from pathlib import Path
-from datetime import datetime
 from typing import Optional
+
 from PIL import Image, ExifTags
 
-
-class ExifData:
-    def __init__(
-        self,
-        created_at: Optional[datetime],
-        width: Optional[int],
-        height: Optional[int],
-        orientation: Optional[int],
-        camera_model: Optional[str],
-    ):
-        self.created_at = created_at
-        self.width = width
-        self.height = height
-        self.orientation = orientation
-        self.camera_model = camera_model
+from app.media.domain.exif import ExifData
+from app.media.domain.services import ExifReader
 
 
-class ExifExtractor:
-
-    def extract(self, path: Path) -> ExifData:
+class PillowExifReader(ExifReader):
+    def extract(self, path: Path) -> Optional[ExifData]:
         try:
-            img = Image.open(path)
-            exif = img._getexif()
+            with Image.open(path) as img:
+                exif_raw = img._getexif() or {}
+                exif = {
+                    ExifTags.TAGS.get(k, k): v
+                    for k, v in exif_raw.items()
+                }
 
-            if not exif:
-                return ExifData(None, img.width, img.height, None, None)
+                width, height = img.size
 
-            # Convertir IDs numéricos a nombres
-            exif_data = {
-                ExifTags.TAGS.get(tag_id, tag_id): value
-                for tag_id, value in exif.items()
-            }
+                created_at = None
+                dt = exif.get("DateTimeOriginal") or exif.get("DateTime")
+                if dt:
+                    # simplificado; puedes parsear bien con datetime.strptime
+                    from datetime import datetime
 
-            # Fecha de captura
-            date_str = exif_data.get("DateTimeOriginal") or exif_data.get("DateTime")
-            created_at = (
-                datetime.strptime(date_str, "%Y:%m:%d %H:%M:%S")
-                if date_str
-                else None
-            )
+                    try:
+                        created_at = datetime.strptime(dt, "%Y:%m:%d %H:%M:%S")
+                    except Exception:
+                        created_at = None
 
-            return ExifData(
-                created_at=created_at,
-                width=img.width,
-                height=img.height,
-                orientation=exif_data.get("Orientation"),
-                camera_model=exif_data.get("Model"),
-            )
-
+                return ExifData(
+                    width=width,
+                    height=height,
+                    orientation=exif.get("Orientation"),
+                    camera_make=exif.get("Make"),
+                    camera_model=exif.get("Model"),
+                    lens_model=exif.get("LensModel"),
+                    iso=exif.get("ISOSpeedRatings"),
+                    aperture=None,
+                    shutter_speed=None,
+                    focal_length=None,
+                    created_at=created_at,
+                )
         except Exception:
-            return ExifData(None, None, None, None, None)
+            return None

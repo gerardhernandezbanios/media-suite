@@ -1,35 +1,24 @@
 #services/backend/app/media/api/upload.py
-from fastapi import APIRouter, UploadFile, Depends
-from services.backend.app.shared.dto.media import MediaItemDTO
-from sqlalchemy.ext.asyncio import AsyncSession
+from __future__ import annotations
 
-from app.media.application.commands import UploadMediaCommand, UploadMediaService
-from app.media.infrastructure.db.repositories import MediaRepository
-from app.core.db import get_session  # lo creamos ahora
+from typing import List
 
 from fastapi import APIRouter, UploadFile, Depends
+
 from app.media.application.services import UploadMediaService
+from app.shared.dto.media import MediaItemDTO
+from app.core.container import container
 
-router = APIRouter()
+router = APIRouter(prefix="/media", tags=["media"])
 
-@router.post("/upload", response_model=list[MediaItemDTO])
+
+def get_upload_service() -> UploadMediaService:
+    return container.upload_media_service()
+
+
+@router.post("/upload", response_model=List[MediaItemDTO])
 async def upload_media(
-    files: list[UploadFile],
-    service: UploadMediaService = Depends(),
-):
+    files: List[UploadFile],
+    service: UploadMediaService = Depends(get_upload_service),
+) -> List[MediaItemDTO]:
     return await service.handle(files)
-
-
-# router = APIRouter()
-
-
-# @router.post("/upload")
-# async def upload_media(
-#     file: UploadFile,
-#     session: AsyncSession = Depends(get_session)
-# ):
-#     repo = MediaRepository(session)
-#     service = UploadMediaService(repo)
-
-#     result = await service.execute(UploadMediaCommand(file=file))
-#     return {"items": [item.id for item in result]}

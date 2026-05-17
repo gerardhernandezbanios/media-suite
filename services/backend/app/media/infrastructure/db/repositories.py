@@ -1,27 +1,31 @@
 # services/backend/app/media/infrastructure/db/repositories.py
+from __future__ import annotations
+
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from app.media.infrastructure.db.models import MediaItemModel
-from app.media.infrastructure.db.mappers import model_to_domain
+
+from app.media.domain.entities import MediaItem
+from app.media.domain.repositories import MediaItemRepository
+from app.media.infrastructure.db.models import MediaItemModel, MediaMetadataModel
+from app.media.infrastructure.db.mappers import (
+    domain_to_model,
+    model_to_domain,
+    metadata_domain_to_model,
+)
 
 
-class MediaRepository:
-
+class SqlAlchemyMediaItemRepository(MediaItemRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def add(self, model: MediaItemModel):
+    async def save(self, item: MediaItem) -> MediaItem:
+        model: MediaItemModel = domain_to_model(item)
         self.session.add(model)
+
+        if getattr(item, "metadata", None) is not None:
+            meta_model: MediaMetadataModel = metadata_domain_to_model(item.metadata)
+            meta_model.media_item = model
+            self.session.add(meta_model)
+
         await self.session.flush()
+        await self.session.refresh(model)
         return model_to_domain(model)
-
-    async def get_by_id(self, media_id: int):
-        stmt = select(MediaItemModel).where(MediaItemModel.id == media_id)
-        result = await self.session.execute(stmt)
-        model = result.scalar_one_or_none()
-        return model_to_domain(model) if model else None
-
-    async def list(self, limit: int = 100):
-        stmt = select(MediaItemModel).limit(limit)
-        result = await self.session.execute(stmt)
-        return [model_to_domain(m) for m in result.scalars().all()]

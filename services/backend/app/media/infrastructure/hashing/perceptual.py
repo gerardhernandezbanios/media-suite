@@ -1,11 +1,16 @@
 # services/backend/app/media/infrastructure/hashing/perceptual.py
-from pathlib import Path
-from PIL import Image
-import imagehash
+from __future__ import annotations
 
-def compute_phash(path: Path) -> str | None:
+from pathlib import Path
+from typing import Optional
+
+import imagehash
+from PIL import Image
+
+
+def compute_phash(path: Path) -> Optional[str]:
     try:
-        img = Image.open(path)
-        return str(imagehash.phash(img))
+        with Image.open(path) as img:
+            return str(imagehash.phash(img))
     except Exception:
         return None

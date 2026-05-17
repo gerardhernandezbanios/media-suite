@@ -1,33 +1,33 @@
 # services/backend/app/media/infrastructure/filesystem/storage.py
+from __future__ import annotations
+
 import shutil
-from pathlib import Path
 from datetime import datetime
-from app.core.config import settings
+from pathlib import Path
+
+from app.media.domain.entities import MediaItem
+from app.media.domain.services import MediaStorage
 
 
-class FilesystemStorage:
+class LibraryMediaStorage(MediaStorage):
+    def __init__(self, base_dir: Path):
+        self.base_dir = base_dir
 
-    def __init__(self):
-        self.media_root = Path(settings.MEDIA_ROOT)
-        self.temp_root = self.media_root / "_temp"
-        self.temp_root.mkdir(parents=True, exist_ok=True)
+    def move_to_library(self, src: Path, item: MediaItem) -> Path:
+        created = item.created_at or datetime.utcnow()
+        year = f"{created.year:04d}"
+        month = f"{created.month:02d}"
 
-    def save_temp(self, file, filename: str) -> Path:
-        """Guarda el archivo subido en una carpeta temporal."""
-        temp_path = self.temp_root / filename
-        with temp_path.open("wb") as f:
-            shutil.copyfileobj(file.file, f)
-        return temp_path
+        if item.type.name.lower() == "image":
+            subdir = "image"
+        elif item.type.name.lower() == "video":
+            subdir = "video"
+        else:
+            subdir = "other"
 
-    def move_to_final_location(self, temp_path: Path, media_type: str, created_at: datetime) -> Path:
-        """Mueve el archivo a /media/{image|video}/{año}/{mes}/filename"""
-        year = str(created_at.year)
-        month = f"{created_at.month:02d}"
+        target_dir = self.base_dir / subdir / year / month
+        target_dir.mkdir(parents=True, exist_ok=True)
 
-        final_dir = self.media_root / media_type / year / month
-        final_dir.mkdir(parents=True, exist_ok=True)
-
-        final_path = final_dir / temp_path.name
-        shutil.move(str(temp_path), final_path)
-
-        return final_path
+        target = target_dir / src.name
+        shutil.move(str(src), target)
+        return target
