@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 
 from app.media.domain.entities import MediaItem
-from app.media.domain.services import MediaStorage
+from services.backend.app.media.domain.services.services import MediaStorage
 
 
 class LibraryMediaStorage(MediaStorage):

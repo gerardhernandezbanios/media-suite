@@ -8,9 +8,9 @@ from typing import List
 from fastapi import UploadFile
 
 from app.media.domain.entities import MediaItem
-from app.media.domain.repositories import MediaItemRepository
-from app.media.domain.services import ExifReader, HashCalculator, MediaStorage
-from app.media.domain.exif import ExifData
+from services.backend.app.media.domain.repositories.repositories import MediaItemRepository
+from services.backend.app.media.domain.services.services import ExifReader, HashCalculator, MediaStorage
+from services.backend.app.media.domain.entities.exif import ExifData
 from app.media.application.commands import IngestMediaCommand
 from app.shared.dto.media import MediaItemDTO
 from app.media.infrastructure.db.mappers import domain_to_dto

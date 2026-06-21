@@ -4,7 +4,7 @@ from __future__ import annotations
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.media.domain.entities import MediaItem
-from app.media.domain.repositories import MediaItemRepository
+from services.backend.app.media.domain.repositories.repositories import MediaItemRepository
 from app.media.infrastructure.db.models import MediaItemModel, MediaMetadataModel
 from app.media.infrastructure.db.mappers import (
     domain_to_model,

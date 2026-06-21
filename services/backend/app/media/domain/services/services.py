@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Optional, Protocol
 
 from app.media.domain.entities import MediaItem
-from app.media.domain.exif import ExifData
+from services.backend.app.media.domain.entities.exif import ExifData
 
 
 class ExifReader(Protocol):

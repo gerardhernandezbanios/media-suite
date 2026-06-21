@@ -44,7 +44,7 @@ from pathlib import Path
 from typing import Optional
 
 from app.media.domain.value_objects import MediaType
-from app.media.domain.exif import ExifData
+from services.backend.app.media.domain.entities.exif import ExifData
 
 
 @dataclass

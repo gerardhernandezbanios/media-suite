@@ -6,8 +6,8 @@ from typing import Optional
 
 from PIL import Image, ExifTags
 
-from app.media.domain.exif import ExifData
-from app.media.domain.services import ExifReader
+from services.backend.app.media.domain.entities.exif import ExifData
+from services.backend.app.media.domain.services.services import ExifReader
 
 
 class PillowExifReader(ExifReader):

@@ -4,7 +4,7 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
-from app.media.domain.services import HashCalculator
+from services.backend.app.media.domain.services.services import HashCalculator
 from app.media.infrastructure.hashing.perceptual import compute_phash
 
 
