@@ -9,19 +9,15 @@
 from pathlib import Path
 
 from dependency_injector import containers, providers
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.config import settings
 
-from services.backend.app.media.application.use_cases.upload_media_use_case import UploadMediaUseCase
-from services.backend.app.media.domain.services.job_port import JobPort
-from services.backend.app.media.infrastructure.filesystem.job_filesystem_adapter import JobFilesystemAdapter
-from sqlalchemy.ext.asyncio import AsyncSession
+from app.media.application.use_cases.upload_media_use_case import UploadMediaUseCase
+from app.media.application.use_cases.process_job_use_case import ProcessJobUseCase
+from app.media.domain.services.job_port import JobPort
+from app.media.infrastructure.filesystem.job_filesystem_adapter import JobFilesystemAdapter
 
-from app.media.application.services import (
-    FileUploadService,
-    IngestMediaHandler,
-    UploadMediaService,
-)
 from app.media.infrastructure.exif.extractor import PillowExifReader
 from app.media.infrastructure.hashing.sha256 import DefaultHashCalculator
 from app.media.infrastructure.filesystem.storage import LibraryMediaStorage
@@ -103,6 +99,16 @@ class Container(containers.DeclarativeContainer):
         UploadMediaUseCase,
         job_port=job_port,
     )
+    process_job_use_case = providers.Factory(
+    ProcessJobUseCase,
+    job_port=job_port,
+    zip_extractor=zip_extractor_port,
+    media_type_detector=media_type_detector_port,
+    exif_reader=exif_reader_port,
+    hasher=hasher_port,
+    media_path_factory=media_path_factory_port,
+)
+
 
 
 container = Container()
