@@ -1,65 +1,57 @@
 # services/backend/app/media/application/use_cases/upload_media_use_case.py
 """
 # 🧩 1. Use case: UploadMediaUseCase
-# Este es el caso de uso que llama la API.
 
-# Responsabilidades:
+        Responsabilidad principal:
 
-# Recibir lista de ficheros subidos (FastAPI UploadFile o paths temporales).
+            Recibir la petición de subida (1 fichero, varios, ZIP).
+            Crear un job:
+                Generar job_id
+                Crear carpeta /work/incoming/{job_id}
+                Guardar todos los ficheros tal cual:
+                    Foto1.jpg
+                    Video1.mp4
+                    Archivo.zip
+                Crear status.json con:
+                    Status = "pending"
+                    Lista de ficheros
+                    Timestamps  
+                Devolver job_id al controlador.
 
-# Detectar si cada fichero es:
-
-# Imagen
-
-# Vídeo
-
-# ZIP
-
-# Si es ZIP → descomprimir en un directorio temporal.
-
-# Generar una lista plana de paths reales.
-
-# Encolar cada fichero en la cola (QueuePort) para ingesta asíncrona.
-
-# Devolver un job_id o lista de IDs.
-
-# Este caso de uso NO procesa EXIF, ni hashing, ni mueve ficheros.
-# Solo prepara y encola.
+    Este caso de uso no procesa nada, solo crea el job. Eso mantiene el sistema asíncrono y limpio.
 """
-from services.backend.app.media.application.dto.upload_result_dto import UploadResultDTO
-from services.backend.app.media.application.dto.uploaded_file_dto import UploadedFileDTO
-from services.backend.app.media.domain.services.queue_port import QueuePort
-from services.backend.app.media.domain.services.temp_file_system_port import TempFileSystemPort
-from services.backend.app.media.domain.services.zip_extractor_port import ZipExtractorPort
+import uuid
+from typing import List
+from fastapi import UploadFile
+
+from media.domain.entities.job import Job
+from media.domain.value_objects.job_status import JobStatus
+from media.domain.services.job_port import JobPort
 
 
 class UploadMediaUseCase:
-    def __init__(
-        self,
-        temp_fs: TempFileSystemPort,
-        zip_extractor: ZipExtractorPort,
-        queue: QueuePort,
-    ):
-        self._temp_fs = temp_fs
-        self._zip_extractor = zip_extractor
-        self._queue = queue
 
-    async def execute(self, files: list[UploadedFileDTO]) -> UploadResultDTO:
-        temp_dir = await self._temp_fs.create_temp_dir()
-        all_paths = []
+    def __init__(self, job_port: JobPort):
+        self.job_port = job_port
 
-        for dto in files:
-            temp_path = await self._temp_fs.save_upload(dto, temp_dir)
+    async def execute(self, files: List[UploadFile]) -> str:
+        job_id = str(uuid.uuid4())
 
-            if dto.filename.lower().endswith(".zip"):
-                extracted = await self._zip_extractor.extract(temp_path, temp_dir)
-                all_paths.extend(extracted)
-            else:
-                all_paths.append(temp_path)
+        job = Job(
+            id=job_id,
+            status=JobStatus.PENDING,
+            files=[f.filename for f in files],
+        )
 
-        job_ids = []
-        for path in all_paths:
-            job_id = await self._queue.enqueue("ingest", {"temp_path": path})
-            job_ids.append(job_id)
+        # Crear job en filesystem
+        self.job_port.create_job(job)
 
-        return UploadResultDTO(job_ids=job_ids)
+        # Guardar ficheros dentro del job
+        job_folder = self.job_port._job_folder(JobStatus.PENDING, job_id)
+
+        for file in files:
+            dest = job_folder / file.filename
+            with dest.open("wb") as f:
+                f.write(await file.read())
+
+        return job_id

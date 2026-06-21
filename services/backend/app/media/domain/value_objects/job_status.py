@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 class JobStatus(Enum):
     PENDING = "pending"
-    RUNNING = "running"
-    FAILED = "failed"
+    PROCESSING = "processing"
     DONE = "done"
+    FAILED = "failed"
 
