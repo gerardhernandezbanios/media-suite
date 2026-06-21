@@ -1,7 +1,20 @@
-#services/backend/app/core/container.py
+# services/backend/app/core/container.py
+
+"""
+| .NET      | Python DI                 | Significado                                   |
+| Transient | ``providers.Factory``     | Nueva instancia cada vez                      |
+| Scoped    | ``providers.Resource``    | Instancia por contexto (ideal DB sessions)    |
+| Singleton | ``providers.Singleton``   | Una instancia global                          |
+"""
 from pathlib import Path
 
 from dependency_injector import containers, providers
+
+from core.config import settings
+
+from services.backend.app.media.application.use_cases.upload_media_use_case import UploadMediaUseCase
+from services.backend.app.media.domain.services.job_port import JobPort
+from services.backend.app.media.infrastructure.filesystem.job_filesystem_adapter import JobFilesystemAdapter
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.media.application.services import (
@@ -67,6 +80,29 @@ class Container(containers.DeclarativeContainer):
         ingestor=ingest_media_handler,
     )
 
+    wiring_config = containers.WiringConfiguration(
+        modules=[
+            "media.api.upload",
+            "media.api.media",
+            "media.api.albums",
+        ]
+    )
+
+    # -------------------------
+    # Ports / Adapters
+    # -------------------------
+    job_port: providers.Provider[JobPort] = providers.Factory(
+        JobFilesystemAdapter,
+        base_path=settings.WORK_BASE_PATH,
+    )
+
+    # -------------------------
+    # Use Cases
+    # -------------------------
+    upload_media_use_case = providers.Factory(
+        UploadMediaUseCase,
+        job_port=job_port,
+    )
+
 
 container = Container()
-
