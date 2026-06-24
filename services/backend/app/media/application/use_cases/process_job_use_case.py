@@ -26,8 +26,8 @@
 """
 from pathlib import Path
 
-from media.domain.jobs.job_port import JobPort
-from media.domain.jobs.job_status import JobStatus
+from services.backend.app.media.domain.services import JobPort
+from media.domain.job_status import JobStatus
 
 class ProcessJobUseCase:
     def __init__(
@@ -66,16 +66,30 @@ class ProcessJobUseCase:
                 if file.name == "status.json":
                     continue
 
-                media_type = self.media_type_detector.detect(file)
-                exif = self.exif_reader.read(file)
-                checksum = self.hasher.compute(file)
+                # media_type = self.media_type_detector.detect(file)
+                # exif = self.exif_reader.read(file)
+                # checksum = self.hasher.compute(file)
 
-                final_path = self.media_path_factory.build_path(
-                    file=file,
+                # final_path = self.media_path_factory.build_path(
+                #     file=file,
+                #     media_type=media_type,
+                #     exif=exif,
+                #     checksum=checksum,
+                # )
+
+                filename = file.name
+
+                media_type = self.media_type_detector.detect(filename)
+                exif = self.exif_reader.read(str(file))
+                checksum = self.hasher.compute(str(file))
+
+                media_path = self.media_path_factory.build(
                     media_type=media_type,
-                    exif=exif,
-                    checksum=checksum,
+                    captured_at=exif.captured_at,
+                    filename=f"{checksum}{file.suffix.lower()}"
                 )
+
+                final_path = Path(media_path.as_str())
 
                 final_path.parent.mkdir(parents=True, exist_ok=True)
                 file.rename(final_path)

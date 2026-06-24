@@ -1,4 +1,4 @@
-#services/backend/app/core/events.py
+# services/backend/app/core/events.py
 from fastapi import FastAPI
 
 def register_events(app: FastAPI):

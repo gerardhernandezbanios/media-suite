@@ -1,4 +1,5 @@
 # services/backend/app/media/domain/value_objects/media_path.py
+
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
