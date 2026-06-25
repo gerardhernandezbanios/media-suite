@@ -18,7 +18,8 @@
                     Timestamps  
                 Devolver job_id al controlador.
 
-    Este caso de uso no procesa nada, solo crea el job. Eso mantiene el sistema asíncrono y limpio.
+    Este caso de uso no procesa nada, solo crea el job. 
+    Eso mantiene el sistema asíncrono y limpio.
 """
 import uuid
 from typing import List
