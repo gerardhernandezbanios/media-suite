@@ -1,8 +1,9 @@
 # services/backend/app/media/domain/entities/media_item.py
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import List, Optional
-from .value_objects import MediaType, MediaPath, Checksum
+from services.backend.app.media.domain.value_objects import MediaType, MediaPath, Checksum
+from services.backend.app.media.domain.entities.tag import Tag
 
 @dataclass
 class MediaItem:
@@ -16,7 +17,7 @@ class MediaItem:
     width: Optional[int] = None
     height: Optional[int] = None
     duration_seconds: Optional[float] = None
-    tags: List[str] = None
+    tags: List[Tag] = field(default_factory=list)
 
     def is_photo(self) -> bool:
         return self.type == MediaType.PHOTO

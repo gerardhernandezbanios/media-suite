@@ -1,42 +1,19 @@
 # services/backend/app/media/api/mappers.py
-from app.media.domain.entities import MediaItem, MediaMetadata
-from app.shared.dto.media import MediaItemDTO, MediaTypeDTO
-from app.shared.dto.media import MediaMetadataDTO
 
+from app.media.domain.entities import MediaItem
+from app.media.domain.value_objects import MediaType
+from services.backend.app.media.application.dto.media_item_dto import MediaItemDTO
 
-def metadata_domain_to_dto(entity: MediaMetadata) -> MediaMetadataDTO:
-    return MediaMetadataDTO(
-        width=entity.width,
-        height=entity.height,
-        orientation=entity.orientation,
-        camera_make=entity.camera_make,
-        camera_model=entity.camera_model,
-        lens_model=entity.lens_model,
-        iso=entity.iso,
-        aperture=entity.aperture,
-        shutter_speed=entity.shutter_speed,
-        focal_length=entity.focal_length,
-        created_at=entity.created_at,
-        duration=entity.duration,
-        video_codec=entity.video_codec,
-        audio_codec=entity.audio_codec,
-        frame_rate=entity.frame_rate,
-        bit_rate=entity.bit_rate,
-    )
-
-
-def domain_to_dto(entity: MediaItem) -> MediaItemDTO:
+def media_item_to_dto(entity: MediaItem) -> MediaItemDTO:
     return MediaItemDTO(
         id=entity.id,
-        type=MediaTypeDTO(entity.type.value),
-        filename=entity.filename,
-        filepath=entity.filepath,
-        sha256=entity.sha256,
-        phash=entity.phash,
-        size_bytes=entity.size_bytes,
+        type=entity.type.value,
+        final_path=entity.final_path.as_str() if entity.final_path else None,
+        captured_at=entity.captured_at,
+        imported_at=entity.imported_at,
         width=entity.width,
         height=entity.height,
-        duration=entity.duration,
-        created_at=entity.created_at,
-        ingested_at=entity.ingested_at,
+        duration_seconds=entity.duration_seconds,
+        tags=[t.name for t in entity.tags]
     )
+

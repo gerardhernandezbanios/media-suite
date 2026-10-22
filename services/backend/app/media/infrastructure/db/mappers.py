@@ -1,84 +1,34 @@
 from app.media.domain.entities import MediaItem, MediaType
-from app.media.infrastructure.db.models import MediaItemModel
+from services.backend.app.media.infrastructure.db.media_metadata_model import MediaItemModel
 from app.media.domain.entities import MediaMetadata
-from app.media.infrastructure.db.models import MediaMetadataModel
+from services.backend.app.media.infrastructure.db.media_metadata_model import MediaMetadataModel
 
-
-def metadata_model_to_domain(model: MediaMetadataModel) -> MediaMetadata:
-    return MediaMetadata(
-        id=model.id,
-        media_id=model.media_id,
-        width=model.width,
-        height=model.height,
-        orientation=model.orientation,
-        camera_make=model.camera_make,
-        camera_model=model.camera_model,
-        lens_model=model.lens_model,
-        iso=model.iso,
-        aperture=model.aperture,
-        shutter_speed=model.shutter_speed,
-        focal_length=model.focal_length,
-        created_at=model.created_at,
-        duration=model.duration,
-        video_codec=model.video_codec,
-        audio_codec=model.audio_codec,
-        frame_rate=model.frame_rate,
-        bit_rate=model.bit_rate,
-    )
-
-
-def metadata_domain_to_model(entity: MediaMetadata) -> MediaMetadataModel:
-    return MediaMetadataModel(
-        id=entity.id,
-        media_id=entity.media_id,
-        width=entity.width,
-        height=entity.height,
-        orientation=entity.orientation,
-        camera_make=entity.camera_make,
-        camera_model=entity.camera_model,
-        lens_model=entity.lens_model,
-        iso=entity.iso,
-        aperture=entity.aperture,
-        shutter_speed=entity.shutter_speed,
-        focal_length=entity.focal_length,
-        created_at=entity.created_at,
-        duration=entity.duration,
-        video_codec=entity.video_codec,
-        audio_codec=entity.audio_codec,
-        frame_rate=entity.frame_rate,
-        bit_rate=entity.bit_rate,
-    )
-
-
-def model_to_domain(model: MediaItemModel) -> MediaItem:
+def media_item_from_model(model: MediaItemModel) -> MediaItem:
     return MediaItem(
         id=model.id,
-        type=MediaType(model.type.value),
-        filename=model.filename,
-        filepath=model.filepath,
-        sha256=model.sha256,
-        phash=model.phash,
-        size_bytes=model.size_bytes,
+        type=MediaType(model.type),
+        original_path=model.original_path,
+        final_path=MediaPath.from_str(model.final_path) if model.final_path else None,
+        captured_at=model.captured_at,
+        imported_at=model.imported_at,
+        checksum=Checksum(model.checksum) if model.checksum else None,
         width=model.width,
         height=model.height,
-        duration=model.duration,
-        created_at=model.created_at,
-        ingested_at=model.ingested_at,
+        duration_seconds=model.duration_seconds,
+        tags=[Tag(id=t.id, name=t.name) for t in model.tags]
     )
 
-
-def domain_to_model(entity: MediaItem) -> MediaItemModel:
+def media_item_to_model(entity: MediaItem) -> MediaItemModel:
     return MediaItemModel(
         id=entity.id,
-        type=entity.type,
-        filename=entity.filename,
-        filepath=entity.filepath,
-        sha256=entity.sha256,
-        phash=entity.phash,
-        size_bytes=entity.size_bytes,
+        type=entity.type.value,
+        original_path=entity.original_path,
+        final_path=entity.final_path.as_str() if entity.final_path else None,
+        captured_at=entity.captured_at,
+        imported_at=entity.imported_at,
+        checksum=entity.checksum.value if entity.checksum else None,
         width=entity.width,
         height=entity.height,
-        duration=entity.duration,
-        created_at=entity.created_at,
-        ingested_at=entity.ingested_at,
+        duration_seconds=entity.duration_seconds,
     )
+

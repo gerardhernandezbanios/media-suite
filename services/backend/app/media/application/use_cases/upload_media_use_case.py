@@ -29,30 +29,47 @@ from media.domain.entities.job import Job
 from media.domain.value_objects.job_status import JobStatus
 from media.domain.services.job_port import JobPort
 
-
 class UploadMediaUseCase:
 
     def __init__(self, job_port: JobPort):
         self.job_port = job_port
 
     async def execute(self, files: List[UploadFile]) -> str:
-        job_id = str(uuid.uuid4())
+        # 1. Crear job en dominio
+        job = self.job_port.create_empty_job(files)
 
-        job = Job(
-            id=job_id,
-            status=JobStatus.PENDING,
-            files=[f.filename for f in files],
-        )
+        # 2. Guardar ficheros (streaming)
+        await self.job_port.save_files(job.id, files)
 
-        # Crear job en filesystem
-        self.job_port.create_job(job)
+        # 3. Persistir job (DB + status.json)
+        await self.job_port.persist_job(job)
 
-        # Guardar ficheros dentro del job
-        job_folder = self.job_port._job_folder(JobStatus.PENDING, job_id)
+        return job.id
 
-        for file in files:
-            dest = job_folder / file.filename
-            with dest.open("wb") as f:
-                f.write(await file.read())
 
-        return job_id
+# class UploadMediaUseCase:
+
+#     def __init__(self, job_port: JobPort):
+#         self.job_port = job_port
+
+#     async def execute(self, files: List[UploadFile]) -> str:
+#         job_id = str(uuid.uuid4())
+
+#         job = Job(
+#             id=job_id,
+#             status=JobStatus.PENDING,
+#             files=[f.filename for f in files],
+#         )
+
+#         # Crear job en filesystem
+#         self.job_port.create_job(job)
+
+#         # Guardar ficheros dentro del job
+#         job_folder = self.job_port._job_folder(JobStatus.PENDING, job_id)
+
+#         for file in files:
+#             dest = job_folder / file.filename
+#             with dest.open("wb") as f:
+#                 f.write(await file.read())
+
+#         return job_id

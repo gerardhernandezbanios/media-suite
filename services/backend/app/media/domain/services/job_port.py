@@ -35,3 +35,17 @@ class JobPort(ABC):
     @abstractmethod
     def move_job_to(self, job_id: str, new_status: JobStatus) -> None:
         ...
+
+# nuevos metodos para el caso de uso de subida de ficheros
+
+    @abstractmethod
+    def create_empty_job(self, files: List[UploadFile]) -> Job:
+        ...
+
+    @abstractmethod
+    async def save_files(self, job_id: str, files: List[UploadFile]):
+        ...
+
+    @abstractmethod
+    async def persist_job(self, job: Job):
+        ...

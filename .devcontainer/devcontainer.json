@@ -8,7 +8,7 @@
       "version": "3.12"
     }
   },
-  "postCreateCommand": "pip install poetry && poetry config virtualenvs.in-project true",
+  "postCreateCommand": "cd services/backend && poetry config virtualenvs.in-project true && poetry install",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -24,7 +24,6 @@
   },
   "remoteUser": "vscode",
   "runArgs": [
-    "--network=media-suite-net",
     "--env-file", "${localWorkspaceFolder}/infra/.env"
   ]
   // ],
