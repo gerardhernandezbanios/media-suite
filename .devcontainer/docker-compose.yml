@@ -1,0 +1,33 @@
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    command: sleep infinity
+    volumes:
+      - ..:/workspace:cached
+      - ${MEDIA_PATH:-../data/media}:/data/media
+    env_file:
+      - path: ../infra/.env
+        required: false      # el contenedor arranca aunque falte (Compose >= 2.24)
+    environment:
+      DATABASE_URL: postgresql+asyncpg://dev:dev@db:5432/media
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: media
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev -d media"]
+      interval: 5s
+      retries: 10
+
+volumes:
+  pgdata:

@@ -1,47 +1,39 @@
 # Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Poetry
-poetry.lock
-*/.venv/
-.venv/
-
-# VS Code
-.history/
-
-# Devcontainer
-.devcontainer/.cache/
-
-# Docker
-*.log
-docker-compose.override.yml
-
-# Tests
-.coverage
-pytest_cache/
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Environment variables
-.env
-
-# mypy cache
-.mypy_cache/
-
-# ruff cache
-.ruff_cache/
-
-# pytest cache
-.pytest_cache/
-
-# Python packaging artifacts
+*.py[cod]
 *.egg-info/
 *.egg
 dist/
 build/
-src/ingestor.egg-info/
+.venv/
+
+# Caches y cobertura
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Entorno (se versionan solo las plantillas)
+.env*
+!.env.example
+
+# Datos locales (biblioteca multimedia de desarrollo)
+/data/
+
+# Docker / devcontainer
+docker-compose.override.yml
+.devcontainer/.cache/
+
+# Logs
+*.log
+
+# Frontend (Angular)
+node_modules/
+.angular/
+
+# Editor / OS
+.history/
+.DS_Store
+Thumbs.db
